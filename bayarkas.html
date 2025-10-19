@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pembayaran Kas Kelas ST24</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* CSS Variables untuk palet warna yang elegan dan konsisten */
+:root {
+  --primary-color: #6a6ffb;  /* Biru/ungu yang lebih lembut */
+  --secondary-color: #289ea9; /* Teal dari tema asli */
+  --bg-color: #f8f9fa;       /* Latar belakang halaman (sedikit abu-abu) */
+  --card-bg: #ffffff;      /* Warna kartu (putih) */
+  --text-dark: #343a40;      /* Teks utama */
+  --text-light: #6c757d;     /* Teks sekunder (abu-abu) */
+  --border-color: #e9ecef;   /* Warna border */
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+}
+
+body{
+  font-family: 'Poppins', sans-serif;
+  margin:0; padding:0;
+  background: var(--bg-color); /* Latar belakang baru */
+  color: var(--text-dark);
+}
+
+header{
+  /* Gradient yang lebih halus */
+  background: linear-gradient(90deg, var(--primary-color), #289ea9); 
+  color: white;
+  padding: 1.5rem;
+  text-align:center;
+  border-bottom-left-radius:16px;
+  border-bottom-right-radius:16px;
+  /* Bayangan yang jauh lebih lembut */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); 
+  margin-bottom: 2rem;
+}
+header h1{
+  margin:0; 
+  font-size:1.8rem; 
+  font-weight: 600;
+  /* EFEK BARU: Text Shadow */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Bayangan lembut */
+}
+
+.container{
+  max-width:950px;
+  margin:2rem auto;
+  background: var(--card-bg);
+  border-radius:12px; /* Radius lebih modern */
+  padding:2rem;
+  /* Bayangan kartu yang lebih halus */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); 
+  opacity:0;
+  transform: translateY(20px);
+  animation:fadeInUp 0.8s 0.1s forwards;
+}
+
+@keyframes fadeInUp { to { opacity:1; transform: translateY(0); } }
+
+.info{
+  background: #fcfdff; /* Latar belakang lebih bersih */
+  padding:1.2rem;
+  border-left: 5px solid var(--secondary-color); /* Border lebih tipis */
+  border-radius:8px;
+  margin-bottom:2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard Ringkasan (Summary Grid) */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.summary-box {
+  background: var(--card-bg);
+  padding: 1.25rem;
+  border-radius: 12px;
+  /* Border halus, hilangkan border-bottom tebal */
+  border: 1px solid var(--border-color); 
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.summary-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.07);
+}
+.summary-box h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-light); /* Teks sekunder */
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.summary-value {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--primary-color); /* Warna primer */
+}
+/* Tetap bedakan Total Kas */
+.summary-box:first-child .summary-value {
+  color: var(--secondary-color);
+}
+
+/* Desain Ulang Formulir */
+form{
+  display:flex;
+  flex-direction:column;
+  gap: 1rem; /* Jarak lebih baik */
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius:12px;
+  border: 1px solid var(--border-color); /* Border untuk 'contain' */
+  margin-top: 1.5rem; /* Jarak dari search bar */
+  margin-bottom: 1.5rem;
+}
+form:hover{ transform: none; } /* Hilangkan hover aneh */
+
+/* Desain Ulang Input dan Select */
+input[type="text"], select, #searchBar {
+  padding: 0.8rem 1rem;
+  border-radius: 8px; /* Radius lebih standar */
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  background: #fcfdff; 
+  box-shadow: none;
+  width: 100%; /* Untuk searchBar */
+  box-sizing: border-box; /* Untuk searchBar */
+}
+input[type="text"]::placeholder, #searchBar::placeholder {
+  color: #aaa;
+}
+
+/* Fokus yang elegan */
+input[type="text"]:focus, select:focus, #searchBar:focus{
+  outline:none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(106, 111, 251, 0.15); 
+  background: var(--card-bg);
+}
+
+/* Label yang lebih rapi */
+label {
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: -0.5rem; /* Dekatkan ke select box */
+}
+select {
+    cursor: pointer;
+}
+
+/* === DESAIN ULANG TOMBOL BAYAR (ELEGANT) === */
+.pay-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Pusatkan teks */
+  gap: 8px;
+  text-transform: capitalize;
+}
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 111, 251, 0.3);
+  background: #289ea9; /* Sedikit lebih gelap saat hover */
+}
+.pay-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+  background: #4e54c8; /* Lebih gelap saat ditekan */
+}
+
+/* EFEK BARU: Kelas untuk animasi klik */
+.pay-btn.clicked {
+  animation: buttonClicked 0.4s ease forwards;
+}
+
+@keyframes buttonClicked {
+  0% { transform: scale(1); background: var(--primary-color); }
+  50% { transform: scale(0.98); background: 
+  #4e54c8; box-shadow: 0 0 0 0 rgba(106, 111, 251, 0); }
+  100% { transform: scale(1); background: var(--primary-color); box-shadow: 0 4px 12px rgba(106, 111, 251, 0.3); }
+}
+/* ======================================= */
+
+/* Desain Ulang Progress Bar */
+.progress-container{
+  background: var(--border-color); /* Latar lebih terang */
+  border-radius: 20px; 
+  overflow:hidden; 
+  margin-bottom:1.5rem;
+}
+.progress-bar{
+  height:20px; /* Sedikit lebih tipis */
+  width:0%;
+  /* Gradient yang lebih segar */
+  background: linear-gradient(90deg, #34d399, #10b981); 
+  text-align:center;
+  color:white;
+  font-weight:600; 
+  font-size: 0.85rem;
+  line-height:20px; 
+  transition: width 1s ease-in-out;
+}
+
+/* Desain Ulang Tabel */
+table{
+  width:100%;
+  border-collapse:separate; /* Gunakan separate untuk border-radius */
+  border-spacing: 0;
+  margin-top:1.2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden; /* Penting untuk border-radius */
+}
+th,td{ 
+  padding: 12px 8px; /* Padding lebih */
+  text-align:left; 
+  border-bottom: 1px solid var(--border-color);
+}
+/* Header Tabel */
+th{ 
+  background: #f8f9fa; /* Latar header */
+  font-weight: 600;
+  color: var(--text-light); /* Teks abu-abu */
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-top: 0;
+}
+/* Hapus striping (garis-garis) */
+tbody tr:nth-child(even){ background: transparent; }
+/* Ganti dengan hover yang bersih */
+tbody tr:hover{
+  background: #fafaff;
+  transition:0.2s ease;
+}
+/* Hilangkan border di baris terakhir */
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Status Lunas/Belum */
+.checked{color: var(--success-color); font-weight: 500;}
+.not-paid{color: var(--danger-color); font-weight: 500;}
+
+/* Modal & Toast (Tetap sama, sudah fungsional) */
+.modal{display:none;position:fixed; z-index:10;padding-top:100px; left:0; top:0;width:100%;height:100%; overflow:auto; background-color:rgba(0,0,0,0.7); animation:fadeIn 0.4s;}
+.modal-content{margin:auto; display:block; width:80%; max-width:700px; transform: scale(0.8); animation:zoomIn 0.3s forwards;}
+.close{position:absolute;top:20px;right:35px;color:#fff;font-size:40px;font-weight:bold;cursor:pointer;}
+@keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+@keyframes zoomIn{to{transform:scale(1);}}
+.toast{visibility:hidden;min-width:250px;background-color:#333;color:white;text-align:center;border-radius:8px;padding:1rem;position:fixed;z-index:1;left:50%;bottom:30px;transform:translateX(-50%);font-size:16px;opacity:0;transition:opacity 0.5s,bottom 0.5s;}
+.toast.show{visibility:visible;opacity:1;bottom:50px;}
+
+/* === QRIS Card Styling === */
+.qris-card-wrapper {
+  /* Hapus styling 'info' asli agar bisa fokus ke card */
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0.5rem 0; /* Beri sedikit jarak atas/bawah */
+  margin-bottom: 2rem;
+}
+
+.qris-card {
+  max-width: 300px; /* Lebar ideal untuk QRIS */
+  margin: 0 auto; /* Otomatis ke tengah */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px; /* Sesuai radius container */
+  padding: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.qris-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
+}
+.qris-card h4 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 1.1rem;
+}
+.qris-nominal {
+  font-size: 0.95rem;
+  color: var(--primary-color); /* Pakai warna primer */
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  /* Garis putus-putus di atas nominal */
+  padding-top: 0.75rem;
+  border-top: 2px dashed var(--border-color);
+}
+.qris-image {
+  width: 100%; /* Responsif */
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid #eee; /* Border tipis untuk gambar */
+  margin-bottom: 1rem;
+}
+.qris-footer {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* === EFEK ANIMASI AWAL (STAGGERED LOAD-IN) === */
+
+/* 1. Atur kondisi awal Header & QRIS (transparan) */
+header,
+.qris-card-wrapper {
+  opacity: 0;
+  animation-fill-mode: forwards; /* Tahan state setelah animasi selesai */
+}
+
+/* 2. Animasi Header (muncul dari atas) */
+header {
+  transform: translateY(-20px);
+  /* Nama animasi: slideDown, Durasi: 0.6s, Delay: 0.1s */
+  animation: slideDown 0.6s 0.1s forwards; 
+}
+
+/* 3. Animasi QRIS Card (muncul dari bawah) */
+.qris-card-wrapper {
+  /* Gunakan animasi 'fadeInUp' yang sudah ada di file Anda */
+  /* Durasi: 0.6s, Delay: 0.3s (setelah header) */
+  animation: fadeInUp 0.6s 0.3s forwards;
+}
+
+/* 4. Sesuaikan animasi .container (Konten Utama) */
+.container {
+  /* Atur ulang animasinya agar muncul paling akhir */
+  /* Durasi: 0.7s, Delay: 0.5s (setelah QRIS) */
+  animation: fadeInUp 0.7s 0.5s forwards;
+}
+
+/* 5. Keyframe baru yang dibutuhkan untuk Header */
+@keyframes slideDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<h1>Data Pembayaran Kas Kelas ST24</h1>
+</header>
+
+<div class="qris-card-wrapper">
+  <div class="qris-card">
+    <h4>Bayar Kas ST24</h4>
+    
+    <img src="qris.jpg" alt="QRIS Bendahara" class="qris-image">
+
+    <p class="qris-nominal">Nominal: <strong>Rp 10.000</strong></p>
+    <p class="qris-footer">Atau bayar <strong>Cash</strong> ke Bendahara</p>
+  </div>
+</div>
+
+<div class="summary-grid">
+  <div class="summary-box">
+    <h4>Total Kas Terkumpul</h4>
+    <span id="totalKasValue" class="summary-value">Rp 0</span>
+  </div>
+  <div class="summary-box">
+    <h4>Mahasiswa Belum Bayar</h4>
+    <span id="unpaidCount" class="summary-value">0</span>
+  </div>
+  <div class="summary-box">
+    <h4>Waktu Tersisa</h4>
+    <span id="countdownTimer" class="summary-value">Memuat...</span>
+  </div>
+</div>
+
+<label for="bulanSelect"><strong>Pilih Bulan:</strong></label>
+<select id="bulanSelect">
+<option value="1">Januari</option>
+<option value="2">Februari</option>
+<option value="3">Maret</option>
+<option value="4">April</option>
+<option value="5">Mei</option>
+<option value="6">Juni</option>
+<option value="7">Juli</option>
+<option value="8">Agustus</option>
+<option value="9">September</option>
+<option value="10">Oktober</option>
+<option value="11">November</option>
+<option value="12">Desember</option>
+</select>
+
+<form id="paymentForm">
+<input type="text" id="nim" placeholder="Masukkan NIM" required>
+<select id="metode" required>
+  <option value="">Pilih metode pembayaran</option>
+  <option value="Cash">Cash</option>
+  <option value="Transfer">Transfer</option>
+</select>
+<input type="file" id="bukti" style="display:none;">
+
+<button type="submit" class="pay-btn">
+  <span class="btn-text">sudah bayar</span>
+</button>
+
+</form>
+
+<div class="progress-container"><div class="progress-bar" id="progressBar">0%</div></div>
+
+<input type="text" id="searchBar" placeholder="Cari NIM mahasiswa...">
+
+<table>
+<thead><tr><th>No</th><th>NIM</th><th>Status</th><th>Metode</th><th>Bukti</th></tr></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<div id="modal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImg">
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// Generate 97 NIM 10 digit acak
+const daftarNIM = [
+  "D1401251011", "D1401251027", "D1401251042", "D1401251052", "D1401251059", "D1401251075", "D1401251080", "D1401251089", "D1401251127", "D2401251004", "D2401251018", "D2401251028", "D2401251055", "D2401251060", "D2401251073", "D2401251091", "D2401251092", "D2401251122", "D2401251123", "D2401251169", "D2401251171", "D3401251004", "D3401251015", "D3401251026", "D3401251050", "D3401251070", "D3401251074", "D3401251082", "D3401251100", "D3401251114", "E2401251027", "E2401251030", "E2401251036", "E2401251039", "E2401251051", "E2401251057", "E2401251067", "E2401251104", "E2401251110", "E3401251019", "E3401251038", "E3401251041", "E3401251056", "E3401251060", "E3401251076", "E3401251080", "E3401251088", "E3401251093", "E3401251120", "E3401251128", "E3401251155", "E3401251163", "E4401251001", "E4401251013", "E4401251037", "E4401251047", "E4401251057", "E4401251074", "E4401251080", "G0401251018", "G0401251019", "G0401251021", "G0401251048", "G2401251006", "G2401251019", "G2401251025", "G2401251041", "G2401251053", "G2401251075", "G2401251079", "G2401251082", "G2401251084", "G4401251012", "G4401251026", "G4401251042", "G4401251048", "G4401251060", "G4401251078", "G4401251089", "G4401251091", "G4401251127", "G4401251133", "G8401251006", "G8401251007", "G8401251020", "G8401251028", "G8401251042", "G8401251067", "G8401251077", "G8401251081", "G8401251104", "G8401251107", "G8401251124", "L1401251002", "L1401251005", "L1401251022", "L1401251051"
+  ];
+
+// --- VARIABEL ---
+const tableBody = document.getElementById("tableBody");
+const bulanSelect = document.getElementById("bulanSelect");
+const searchBar = document.getElementById("searchBar");
+const paymentForm = document.getElementById("paymentForm");
+const metodeSelect = document.getElementById("metode");
+const buktiInput = document.getElementById("bukti");
+const progressBar = document.getElementById("progressBar");
+const countdownTimer = document.getElementById("countdownTimer");
+const toast = document.getElementById("toast");
+const unpaidCountEl = document.getElementById("unpaidCount");
+const totalKasEl = document.getElementById("totalKasValue"); // Variabel baru
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const spanClose = document.getElementsByClassName("close")[0];
+
+let statusBayar = JSON.parse(localStorage.getItem("statusBayar")) || {};
+
+// --- FUNGSI ---
+spanClose.onclick = ()=> modal.style.display="none";
+
+function renderTable(){
+  const bulan = bulanSelect.value;
+  tableBody.innerHTML = "";
+  const filter = searchBar.value.toLowerCase();
+  
+  daftarNIM.forEach((nim,i)=>{
+    const data = statusBayar[nim]?.[bulan];
+    const isPaid = data?.paid;
+    
+    const statusText = isPaid ? "✅ Lunas" : "❌ Belum";
+    const classStatus = isPaid ? "checked" : "not-paid";
+    const metode = data?.metode || "-";
+    const bukti = data?.bukti ? `<a href="#" onclick="showModal('${data.bukti}')">Lihat</a>` : "-";
+    
+    if(!nim.toLowerCase().includes(filter)) return;
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i+1}</td><td>${nim}</td><td class="${classStatus}">${statusText}</td><td>${metode}</td><td>${bukti}</td>`;
+    tableBody.appendChild(tr);
+  });
+}
+
+function updateDashboard() {
+  const bulan = bulanSelect.value;
+  let bayarCount = 0;
+  let unpaidCount = 0;
+  
+  daftarNIM.forEach(nim => {
+    if (statusBayar[nim]?.[bulan]?.paid) {
+      bayarCount++;
+    } else {
+      unpaidCount++;
+    }
+  });
+
+  // 1. Update Total Kas
+  const totalKas = bayarCount * 10000;
+  totalKasEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalKas);
+
+  // 2. Update Belum Bayar
+  unpaidCountEl.textContent = unpaidCount;
+
+  // 3. Update Progress Bar
+  const percent = Math.round((bayarCount / daftarNIM.length) * 100);
+  progressBar.style.width = percent + "%";
+  progressBar.textContent = percent + "%";
+}
+
+
+function updateCountdown(){
+  const bulan = parseInt(bulanSelect.value);
+  const year = new Date().getFullYear();
+  const daysInMonth = new Date(year, bulan, 0).getDate();
+  const deadline = new Date(year, bulan-1, daysInMonth,23,59,59);
+  const now = new Date();
+  let diff = deadline-now;
+  
+  if(diff<=0){ 
+    countdownTimer.textContent="Waktu habis!"; 
+  } else {
+    const days = Math.floor(diff/(1000*60*60*24));
+    const hours = Math.floor((diff/(1000*60*60))%24);
+    const minutes = Math.floor((diff/(1000*60))%60);
+    const seconds = Math.floor((diff/1000)%60);
+    
+    if(days > 0){
+      countdownTimer.textContent = `${days} hari ${hours} jam`;
+    } else {
+      countdownTimer.textContent = `${hours} jam ${minutes} mnt ${seconds} dtk`;
+    }
+  }
+}
+
+function showToast(msg){ toast.textContent=msg; toast.classList.add("show"); setTimeout(()=>{toast.classList.remove("show");},2000);}
+function showModal(src){ modal.style.display="block"; modalImg.src=src; }
+
+// --- EVENT LISTENERS ---
+metodeSelect.addEventListener("change",()=>{
+  if(metodeSelect.value==="Transfer"){ buktiInput.style.display="block"; }
+  else{ buktiInput.style.display="none"; buktiInput.value=""; }
+});
+
+paymentForm.addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const nim = document.getElementById("nim").value.trim();
+  const metode = metodeSelect.value;
+  const file = buktiInput.files[0];
+  const bulan = bulanSelect.value;
+  if(!daftarNIM.includes(nim)){alert("NIM tidak terdaftar!"); return;}
+  if(metode===""){alert("Pilih metode pembayaran!");return;}
+  if(metode==="Transfer" && !file){alert("Harap upload bukti pembayaran!");return;}
+  if(!statusBayar[nim]) statusBayar[nim]={};
+  const saveData={paid:true,metode:metode,bukti:null};
+  
+  if(file){
+    const reader=new FileReader();
+    reader.onload=function(){
+      saveData.bukti=reader.result;
+      statusBayar[nim][bulan]=saveData;
+      localStorage.setItem("statusBayar",JSON.stringify(statusBayar));
+      renderTable(); updateDashboard(); showToast(`Pembayaran bulan ${bulan} tercatat untuk NIM ${nim}.`);
+      paymentForm.reset(); buktiInput.style.display="none";
+
+      // EFEK BARU: Tambahkan efek klik pada tombol
+      const payButton = document.querySelector('.pay-btn');
+      payButton.classList.add('clicked');
+      setTimeout(() => {
+          payButton.classList.remove('clicked');
+      }, 400); // Durasi harus sesuai dengan durasi animasi
+    };
+    reader.readAsDataURL(file);
+  } else {
+    statusBayar[nim][bulan]=saveData;
+    localStorage.setItem("statusBayar",JSON.stringify(statusBayar));
+    renderTable(); updateDashboard(); showToast(`Pembayaran bulan ${bulan} tercatat untuk NIM ${nim}.`);
+    paymentForm.reset();
+
+    // EFEK BARU: Tambahkan efek klik pada tombol
+    const payButton = document.querySelector('.pay-btn');
+    payButton.classList.add('clicked');
+    setTimeout(() => {
+        payButton.classList.remove('clicked');
+    }, 400); // Durasi harus sesuai dengan durasi animasi
+  }
+});
+
+setInterval(()=>{ updateCountdown(); },1000);
+
+bulanSelect.addEventListener("change",()=>{ 
+  renderTable(); 
+  updateCountdown(); 
+  updateDashboard(); 
+});
+
+searchBar.addEventListener("input",()=>{ renderTable(); });
+
+renderTable(); 
+updateCountdown(); 
+updateDashboard();
+</script>
+</body>
+</html>
