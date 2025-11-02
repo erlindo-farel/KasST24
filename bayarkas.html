@@ -52,6 +52,12 @@ tbody tr:hover{background:#fafaff;transition:0.2s ease;}
 tbody tr:last-child td{border-bottom:0;}
 .checked{color:var(--success-color);font-weight:500;}
 .not-paid{color:var(--danger-color);font-weight:500;}
+/* TAMBAHKAN KODE DI BAWAH INI */
+.pending {
+  color: #ffa000; /* Warna Oranye / Kuning Tua */
+  font-weight: 500;
+  font-style: italic;
+}
 /* HILANGKAN MODAL, KARENA KITA PAKAI LINK LANGSUNG */
 .toast{visibility:hidden;min-width:250px;background-color:#333;color:white;text-align:center;border-radius:8px;padding:1rem;position:fixed;z-index:1;left:50%;bottom:30px;transform:translateX(-50%);font-size:16px;opacity:0;transition:opacity 0.5s,bottom 0.5s;}
 .toast.show{visibility:visible;opacity:1;bottom:50px;}
@@ -178,6 +184,7 @@ let statusBayar = {}; // Data akan diisi oleh fungsi loadDataFromServer()
 
 // (Fungsi showModal dan close modal DIHAPUS, karena kita pakai link)
 
+// GANTI DENGAN BLOK FUNGSI BARU INI:
 function renderTable(){
   const bulan = bulanSelect.value;
   tableBody.innerHTML = "";
@@ -189,15 +196,29 @@ function renderTable(){
   }
   
   daftarNIM.forEach((nim,i)=>{
-    const data = statusBayar[nim]?.[bulan]; // Logika ini TETAP SAMA
-    const isPaid = data?.paid;
+    const data = statusBayar[nim]?.[bulan];
     
-    const statusText = isPaid ? "✅ Lunas" : "❌ Belum";
-    const classStatus = isPaid ? "checked" : "not-paid";
+    // --- AWAL LOGIKA BARU UNTUK STATUS ---
+    
+    let statusText = "❌ Belum";
+    let classStatus = "not-paid";
+
+    if (data?.paid === true) {
+      // 1. Cek apakah sudah "Lunas"
+      statusText = "✅ Lunas";
+      classStatus = "checked";
+    } else if (data?.statusText === "Menunggu Konfirmasi") {
+      // 2. Jika tidak lunas, cek apakah "Menunggu Konfirmasi"
+      statusText = "⏳ Menunggu Konfirmasi";
+      classStatus = "pending"; // Ini kelas CSS baru
+    }
+    // 3. Jika tidak keduanya, maka akan tetap "❌ Belum"
+    
     const metode = data?.metode || "-";
-    
-    // UBAH BAGIAN BUKTI: Ganti modal dengan link ke Google Drive
+    // Baris ini tetap sama
     const bukti = data?.bukti ? `<a href="${data.bukti}" target="_blank">Lihat Bukti</a>` : "-";
+    
+    // --- AKHIR LOGIKA BARU UNTUK STATUS ---
     
     if(!nim.toLowerCase().includes(filter)) return;
     
@@ -206,6 +227,7 @@ function renderTable(){
     tableBody.appendChild(tr);
   });
 }
+
 
 function updateDashboard() {
   const bulan = bulanSelect.value;
