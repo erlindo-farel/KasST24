@@ -3,409 +3,382 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pembayaran Kas Kelas ST24</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Sistem Keuangan ST24</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 <style>
-/* ... (SEMUA KODE CSS ANDA YANG PANJANG ITU SEHARUSNYA ADA DI SINI) ... */
+/* --- SETUP CSS (MODERN & CLEAN) --- */
 :root {
-  --primary-color: #6a6ffb;  /* Biru/ungu yang lebih lembut */
-  --secondary-color: #289ea9; /* Teal dari tema asli */
-  --bg-color: #f8f9fa;       /* Latar belakang halaman (sedikit abu-abu) */
-  --card-bg: #ffffff;      /* Warna kartu (putih) */
-  --text-dark: #343a40;      /* Teks utama */
-  --text-light: #6c757d;     /* Teks sekunder (abu-abu) */
-  --border-color: #e9ecef;   /* Warna border */
-  --success-color: #28a745;
-  --danger-color: #dc3545;
+  --primary: #4f46e5; --primary-glow: rgba(79, 70, 229, 0.4); --secondary: #0ea5e9;
+  --bg-light: #f3f4f6; --card-light: rgba(255, 255, 255, 0.7);
+  --text-dark: #1e293b; --text-gray: #64748b; --border-light: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --wa-color: #25D366;
 }
-body{font-family:'Poppins',sans-serif;margin:0;padding:0;background:var(--bg-color);color:var(--text-dark);}
-header{background:linear-gradient(90deg, var(--primary-color), #289ea9);color:white;padding:1.5rem;text-align:center;border-bottom-left-radius:16px;border-bottom-right-radius:16px;box-shadow:0 4px 12px rgba(0, 0, 0, 0.5);margin-bottom:2rem;}
-header h1{margin:0;font-size:1.8rem;font-weight:600;text-shadow:2px 2px 4px rgba(0, 0, 0, 0.2);}
-.container{max-width:950px;margin:2rem auto;background:var(--card-bg);border-radius:12px;padding:2rem;box-shadow:0 8px 30px rgba(0, 0, 0, 0.2);opacity:0;transform:translateY(20px);animation:fadeInUp 0.8s 0.1s forwards;}
-@keyframes fadeInUp{to{opacity:1;transform:translateY(0);}}
-.info{background:#fcfdff;padding:1.2rem;border-left:5px solid var(--secondary-color);border-radius:8px;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.5rem;margin-bottom:2rem;}
-.summary-box{background:var(--card-bg);padding:1.25rem;border-radius:12px;border:1px solid var(--border-color);text-align:center;transition:transform 0.3s ease, box-shadow 0.3s ease;}
-.summary-box:hover{transform:translateY(-4px);box-shadow:0 6px 15px rgba(0,0,0,0.07);}
-.summary-box h4{margin:0 0 0.5rem 0;font-size:0.9rem;color:var(--text-light);font-weight:500;text-transform:uppercase;}
-.summary-value{font-size:1.7rem;font-weight:600;color:var(--primary-color);}
-.summary-box:first-child .summary-value{color:var(--secondary-color);}
-form{display:flex;flex-direction:column;gap:1rem;background:var(--card-bg);padding:1.5rem;border-radius:12px;border:1px solid var(--border-color);margin-top:1.5rem;margin-bottom:1.5rem;}
-form:hover{transform:none;}
-input[type="text"],select,#searchBar{padding:0.8rem 1rem;border-radius:8px;border:1px solid var(--border-color);font-size:1rem;font-family:'Poppins', sans-serif;transition:all 0.3s ease;background:#fcfdff;box-shadow:none;width:100%;box-sizing:border-box;}
-input[type="text"]::placeholder,#searchBar::placeholder{color:#aaa;}
-input[type="text"]:focus,select:focus,#searchBar:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 3px rgba(106, 111, 251, 0.15);background:var(--card-bg);}
-label{font-weight:500;color:var(--text-dark);margin-bottom:-0.5rem;}
-select{cursor:pointer;}
-.pay-btn{padding:12px 24px;font-size:16px;background:var(--primary-color);color:white;border:none;border-radius:8px;cursor:pointer;transition:all 0.3s ease;font-weight:600;font-family:'Poppins', sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-transform:capitalize;}
-.pay-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(106, 111, 251, 0.3);background:#289ea9;}
-.pay-btn:active{transform:translateY(0);box-shadow:none;background:#4e54c8;}
-.pay-btn.clicked{animation:buttonClicked 0.4s ease forwards;}
-@keyframes buttonClicked{0%{transform:scale(1);background:var(--primary-color);} 50%{transform:scale(0.98);background:#4e54c8;box-shadow:0 0 0 0 rgba(106, 111, 251, 0);} 100%{transform:scale(1);background:var(--primary-color);box-shadow:0 4px 12px rgba(106, 111, 251, 0.3);}}
-.progress-container{background:var(--border-color);border-radius:20px;overflow:hidden;margin-bottom:1.5rem;}
-.progress-bar{height:20px;width:0%;background:linear-gradient(90deg, #34d399, #10b981);text-align:center;color:white;font-weight:600;font-size:0.85rem;line-height:20px;transition:width 1s ease-in-out;}
-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:1.2rem;border:1px solid var(--border-color);border-radius:12px;overflow:hidden;}
-th,td{padding:12px 8px;text-align:left;border-bottom:1px solid var(--border-color);}
-th{background:#f8f9fa;font-weight:600;color:var(--text-light);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px;border-top:0;}
-tbody tr:nth-child(even){background:transparent;}
-tbody tr:hover{background:#fafaff;transition:0.2s ease;}
-tbody tr:last-child td{border-bottom:0;}
-.checked{color:var(--success-color);font-weight:500;}
-.not-paid{color:var(--danger-color);font-weight:500;}
-/* TAMBAHKAN KODE DI BAWAH INI */
-.pending {
-  color: #ffa000; /* Warna Oranye / Kuning Tua */
-  font-weight: 500;
-  font-style: italic;
+[data-theme="dark"] {
+  --bg-light: #0f172a; --card-light: rgba(30, 41, 59, 0.7);
+  --text-dark: #f8fafc; --text-gray: #94a3b8; --border-light: rgba(255, 255, 255, 0.1);
 }
-/* HILANGKAN MODAL, KARENA KITA PAKAI LINK LANGSUNG */
-.toast{visibility:hidden;min-width:250px;background-color:#333;color:white;text-align:center;border-radius:8px;padding:1rem;position:fixed;z-index:1;left:50%;bottom:30px;transform:translateX(-50%);font-size:16px;opacity:0;transition:opacity 0.5s,bottom 0.5s;}
-.toast.show{visibility:visible;opacity:1;bottom:50px;}
-.qris-card-wrapper{background:none;border:none;box-shadow:none;padding:0.5rem 0;margin-bottom:2rem;}
-.qris-card{max-width:300px;margin:0 auto;background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;box-shadow:0 6px 20px rgba(0, 0, 0, 0.07);text-align:center;transition:transform 0.3s ease, box-shadow 0.3s ease;}
-.qris-card:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(0, 0, 0, 0.09);}
-.qris-card h4{margin:0 0 0.5rem 0;font-weight:600;color:var(--text-dark);font-size:1.1rem;}
-.qris-nominal{font-size:0.95rem;color:var(--primary-color);font-weight:500;margin:0 0 1rem 0;padding-top:0.75rem;border-top:2px dashed var(--border-color);}
-.qris-image{width:100%;height:auto;border-radius:16px;border:1px solid #eee;margin-bottom:1rem;}
-.qris-footer{font-size:0.85rem;color:var(--text-light);margin:0;}
-header, .qris-card-wrapper{opacity:0;animation-fill-mode:forwards;}
-header{transform:translateY(-20px);animation:slideDown 0.6s 0.1s forwards;}
-.qris-card-wrapper{animation:fadeInUp 0.6s 0.3s forwards;}
-.container{animation:fadeInUp 0.7s 0.5s forwards;}
-@keyframes slideDown{to{opacity:1;transform:translateY(0);}}
+* { box-sizing: border-box; transition: all 0.3s ease; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-light); color: var(--text-dark); margin: 0; padding: 0; min-height: 100vh; background-image: radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%); background-attachment: fixed; }
+
+/* LAYOUT */
+.app-container { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light); }
+.brand h1 { margin: 0; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.theme-toggle { background: var(--card-light); border: 1px solid var(--border-light); color: var(--text-dark); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* CARDS & STATS */
+.glass-card { background: var(--card-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-light); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-box { background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 1rem; }
+[data-theme="dark"] .stat-box { background: rgba(30, 41, 59, 0.5); }
+.stat-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-glow); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.stat-info h4 { margin: 0; font-size: 0.85rem; color: var(--text-gray); font-weight: 500; }
+.stat-info span { font-size: 1.25rem; font-weight: 700; color: var(--text-dark); }
+
+/* BUTTONS */
+.pay-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; color: white; transition: transform 0.2s; border: none; cursor: pointer; }
+.pay-link-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.btn-primary { background: linear-gradient(135deg, var(--primary), #4338ca); color: white; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.8rem 1rem; border-radius: 10px; width: 100%; }
+
+/* INPUTS */
+.input-group { margin-bottom: 1rem; position: relative; }
+label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+input, select { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--border-light); background: rgba(255, 255, 255, 0.8); color: var(--text-dark); outline: none; }
+[data-theme="dark"] input, [data-theme="dark"] select { background: rgba(15, 23, 42, 0.6); }
+
+/* AUTOCOMPLETE (FIX KEYBOARD TERTUTUP) */
+.suggestion-box { position: absolute; top: 100%; left: 0; width: 100%; background: var(--card-light); border: 1px solid var(--border-light); border-radius: 0 0 10px 10px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.suggestion-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; display: flex; justify-content: space-between; }
+.suggestion-item:hover { background: var(--primary-glow); color: var(--primary); }
+
+/* TABLE */
+.table-container { overflow-x: auto; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
+th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text-gray); font-size: 0.85rem; text-transform: uppercase; }
+.badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+/* WA BUTTON STYLE (SINGLE BUTTON) */
+.btn-wa-group { background: var(--wa-color); color: white; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 600; margin-left: auto; }
+.btn-wa-group:hover { background: #1ebc57; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+
+/* UTILS */
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.modal.show { display: flex; opacity: 1; }
+.modal-content { max-width: 90%; max-height: 90%; border-radius: 8px; }
+.close-modal { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--text-dark); color: var(--bg-light); padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: translateY(100px); opacity: 0; transition: all 0.4s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error { background: var(--danger); color: white; }
+.progress-track { height: 10px; background: var(--border-light); border-radius: 5px; overflow: hidden; margin-top: 1rem;}
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #34d399); width: 0%; transition: width 1s ease; }
 </style>
 </head>
 <body>
 
-<header>
-<h1>Data Pembayaran Kas Kelas ST24</h1>
-</header>
-
-<div class="qris-card-wrapper">
-  <div class="qris-card">
-    <h4>Bayar Kas ST24</h4>
-    <img src="qris.jpg" alt="QRIS Bendahara" class="qris-image">
-    <p class="qris-nominal">Nominal: <strong>Rp 10.000</strong></p>
-    <p class="qris-footer">Atau bayar <strong>Cash</strong> ke Bendahara</p>
-  </div>
-</div>
-
-<div class="container">
-  <div class="summary-grid">
-    <div class="summary-box">
-      <h4>Total Kas Terkumpul</h4>
-      <span id="totalKasValue" class="summary-value">Rp 0</span>
+<div class="app-container">
+  <header>
+    <div class="brand">
+      <h1><i class="fa-solid fa-wallet"></i> Kas Kelas ST24</h1>
+      <small style="color:var(--text-gray)">Manajemen Keuangan Transparan</small>
     </div>
-    <div class="summary-box">
-      <h4>Mahasiswa Belum Bayar</h4>
-      <span id="unpaidCount" class="summary-value">0</span>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+  </header>
+
+  <div class="stats-grid">
+    <div class="glass-card stat-box">
+      <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+      <div class="stat-info"><h4>Total Kas</h4><span id="totalKasValue">Rp 0</span></div>
     </div>
-    <div class="summary-box">
-      <h4>Waktu Tersisa</h4>
-      <span id="countdownTimer" class="summary-value">Memuat...</span>
+    <div class="glass-card stat-box">
+      <div class="stat-icon" style="background: rgba(239,68,68,0.2); color: var(--danger)"><i class="fa-solid fa-user-xmark"></i></div>
+      <div class="stat-info"><h4>Belum Bayar</h4><span id="unpaidCount">0</span></div>
+    </div>
+    <div class="glass-card stat-box">
+      <div class="stat-icon" style="background: rgba(245,158,11,0.2); color: var(--warning)"><i class="fa-solid fa-clock"></i></div>
+      <div class="stat-info"><h4>Deadline</h4><span id="countdownTimer" style="font-size: 1rem;">Memuat...</span></div>
     </div>
   </div>
 
-  <label for="bulanSelect"><strong>Pilih Bulan:</strong></label>
-  <select id="bulanSelect">
-    <option value="1">Januari</option>
-    <option value="2">Februari</option>
-    <option value="3">Maret</option>
-    <option value="4">April</option>
-    <option value="5">Mei</option>
-    <option value="6">Juni</option>
-    <option value="7">Juli</option>
-    <option value="8">Agustus</option>
-    <option value="9">September</option>
-    <option value="10">Oktober</option>
-    <option value="11">November</option>
-    <option value="12">Desember</option>
-  </select>
+  <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem;">
+    <style>@media(max-width: 768px){.grid-layout{grid-template-columns:1fr !important;}}</style>
+    
+    <div class="sidebar">
+      <div class="glass-card" style="text-align:center;">
+        <h3 style="margin-top:0;"><i class="fa-solid fa-qrcode"></i> Scan QRIS</h3>
+        <p style="font-size:0.9rem; color:var(--text-gray); margin-bottom:1rem;">Scan pakai DANA, GoPay, Shopee, atau M-Banking apa saja.</p>
+        <div class="qris-wrapper" style="display:block; margin-bottom:10px;">
+          <img src="qris.jpg" alt="QRIS Kas Kelas" class="qris-img" style="width:100%; max-width:250px; border-radius:12px; border: 2px solid var(--text-dark);">
+          <p style="margin-top:10px; font-weight:600; color:var(--primary); font-size:0.9rem;">a.n Siti Zahrah Salamah</p>
+        </div>
+        <a href="qris.jpg" download="QRIS_Kas_ST24.jpg" class="pay-link-btn" style="background:var(--text-dark); width:100%; text-decoration:none;">
+            <i class="fa-solid fa-download"></i> Simpan Gambar QRIS
+        </a>
+      </div>
 
-  <form id="paymentForm">
-    <input type="text" id="nim" placeholder="Masukkan NIM" required>
-    <select id="metode" required>
-      <option value="">Pilih metode pembayaran</option>
-      <option value="Cash">Cash</option>
-      <option value="Transfer">Transfer</option>
-    </select>
-    <input type="file" id="bukti" style="display:none;" accept="image/*">
+      <div class="glass-card">
+        <h3 style="margin-top:0; border-bottom:1px solid var(--border-light); padding-bottom:0.5rem;">Konfirmasi Bayar</h3>
+        <form id="paymentForm">
+          <div class="input-group">
+            <label>Bulan Pembayaran</label>
+            <select id="bulanSelectForm">
+              <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+              <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+              <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+              <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+            </select>
+          </div>
+          
+          <div class="input-group input-wrapper">
+            <label>NIM / Nama Mahasiswa</label>
+            <input type="text" id="nim" placeholder="Ketik NIM atau Nama..." autocomplete="off" required>
+            <div id="customSuggestions" class="suggestion-box"></div>
+            <small id="namaDisplay" style="color:var(--primary); font-weight:600; display:block; margin-top:5px;"></small>
+          </div>
+          
+          <div class="input-group">
+            <label>Metode</label>
+            <select id="metode" required>
+              <option value="">-- Pilih --</option>
+              <option value="Cash">Cash (Tunai)</option>
+              <option value="Transfer">Transfer / QRIS</option>
+            </select>
+          </div>
+          <div class="input-group" id="buktiContainer" style="display:none;">
+            <label>Upload Bukti</label>
+            <input type="file" id="bukti" accept="image/*">
+          </div>
+          <button type="submit" class="btn-primary pay-btn"><i class="fa-solid fa-paper-plane"></i> Kirim Konfirmasi</button>
+        </form>
+      </div>
+    </div>
 
-    <button type="submit" class="pay-btn">
-      <span class="btn-text">sudah bayar</span>
-    </button>
-  </form>
+    <div class="main-content">
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap: wrap; gap: 10px;">
+          <h3 style="margin:0;">Data Kas</h3>
+          
+          <button onclick="tagihGrupWA()" class="btn-wa-group">
+              <i class="fa-brands fa-whatsapp"></i> Tagih ke Grup
+          </button>
+          
+          <select id="bulanSelectView" style="width:auto; padding:0.5rem; margin-left: auto;"></select>
+        </div>
 
-  <div class="progress-container"><div class="progress-bar" id="progressBar">0%</div></div>
-
-  <input type="text" id="searchBar" placeholder="Cari NIM mahasiswa...">
-
-  <table>
-    <thead><tr><th>No</th><th>NIM</th><th>Status</th><th>Metode</th><th>Bukti</th></tr></thead>
-    <tbody id="tableBody">
-      <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
-    </tbody>
-  </table>
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-gray);">
+            <span>Progress Pengumpulan</span><span id="progressText">0%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <input type="text" id="searchBar" style="flex:1;" placeholder="Cari Nama atau NIM...">
+          <button class="btn-primary" onclick="exportToExcel()" style="width:auto; background:var(--success);"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        </div>
+        <div class="table-container">
+          <table id="kasTable">
+            <thead><tr><th>No</th><th>Nama / NIM</th><th>Status</th><th>Metode</th><th>Aksi</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div id="imageModal" class="modal"><span class="close-modal">&times;</span><img class="modal-content" id="img01"></div>
 <div id="toast" class="toast"></div>
 
 <script>
-// =========================================================================
-// SCRIPT BARU UNTUK GOOGLE SHEETS
-// =========================================================================
+// CONFIG
+const scriptURL = "https://script.google.com/macros/s/AKfycbxLx5KhI0lpPAx_8HaWdYO1iN_Hr9Ao75S7WXtiZvLm2ggotcvCe-vhAwhQkUxTYKU3Zg/exec"; 
 
-// !!! PASTE URL WEB APP BARU ANDA DARI BAGIAN 3 DI SINI !!!
-const scriptURL = "https://script.google.com/macros/s/AKfycbxLx5KhI0lpPAx_8HaWdYO1iN_Hr9Ao75S7WXtiZvLm2ggotcvCe-vhAwhQkUxTYKU3Zg/exec";
+// DATABASE MAHASISWA
+const dbMahasiswa = {
+"D1401251011": "Nicolas Alfredo Siahaan", "D1401251027": "DELVINA MAHARANI AZZAHRA", "D1401251042": "Wulan Ramadani", "D1401251052": "Muthia Alina Satifa", "D1401251059": "LIAN KUSUMA WARDANA", "D1401251075": "RADHWA RHASYKA", "D1401251080": "NAUFAL RASYID PUTRATAMA", "D1401251089": "Afif Auryan Nizham", "D1401251127": "MUHAMMAD JAUHAR FIKRI", "D2401251004": "DANANG SUTA WIJAYA", "D2401251018": "Nikolaus Kevin Blay", "D2401251028": "FARENZA NAYLA CHANDRA AUDHEA", "D2401251055": "NABILLA ALDENIA JOHANITHANS SCHOLASTIKA", "D2401251060": "VANNYA SYABANI IRAWAN", "D2401251073": "Sabrina Salsabila Nurmawati", "D2401251091": "Dwi Darmawan", "D2401251092": "SHAFA KHALISYA", "D2401251122": "GANIA INDRI MAHARANI", "D2401251123": "Bungaros Handayani Azzahra Mahmudi", "D2401251169": "Arizki Rahma Zavira", "D2401251171": "JORDAN HARTANTA S. MELIALA", "D3401251004": "DANDY FAREL KENEDY", "D3401251015": "SITI ZAHRAH SALAMAH", "D3401251026": "MAULIDA KHAIRUL NISAH", "D3401251050": "NAILAH KHAIRUN NISA", "D3401251070": "REVA WALIDAH", "D3401251074": "DHIYA DAFFA PRANATANING LARAS", "D3401251082": "FATHIMAH DZIKRO AMANI", "D3401251100": "Raka Kinandita Pinayungan", "D3401251114": "Vonni Asma Nabilah", "E2401251027": "Laily Rasyidah", "E2401251030": "Rieva Septera Putra Budi", "E2401251036": "I PUTU RAKA NUR BINEDA SAMIPUTRA", "E2401251039": "Sistiana Sri Wahyuni", "E2401251051": "Denta Daun Syafanira", "E2401251057": "MATHEW MAXIMUS FEBRILIANT SAMOSIR", "E2401251067": "VIKA MUFLIHAH", "E2401251104": "Kayla Azzahra", "E2401251110": "David Isai Mangera", "E3401251019": "Dedi Sulaiman", "E3401251038": "Fadila Destiana Johannita", "E3401251041": "Tiara Cahya Azizah", "E3401251056": "Rohmi Hud Fakhri", "E3401251060": "Maesaroh", "E3401251076": "AUFA RAFIQI", "E3401251080": "SIMORANGKIR, MEISCHA ASHIVA JOSEPHINE", "E3401251088": "MUTIA ZHARFA RAFIFAH", "E3401251093": "ANITA MEILANI", "E3401251120": "Muhamad Dewandra", "E3401251128": "M. Zilvan Al-Afat", "E3401251155": "Shafa Riyana Maharani", "E3401251163": "Faiq Abdus Salam", "E4401251001": "Nola Kamania Elisa Situmorang", "E4401251013": "Elyasa Firdaus", "E4401251037": "Bilqis Bonit Zulova", "E4401251047": "Azlilatun Khasanah", "E4401251057": "Muhammad Rayhan Alfarizqy Sugadna Budi", "E4401251074": "ADILA NAWAL SYARIF", "E4401251080": "MAULANA DZIKRULLAAH", "G0401251018": "Stevie Johan", "G0401251019": "Alifa Taqiyya", "G0401251021": "Syauqi Bariqullah Nasution", "G0401251048": "Ihsan Mufid Akram", "G2401251006": "Farel Erlindo", "G2401251019": "Nailah Nur Rahman", "G2401251025": "Radithya Devarel Setiawan", "G2401251041": "Aufa Hudzaifa Haura", "G2401251053": "HANIFA AZ ZAHRA", "G2401251075": "ADIA FIRLY ZALIKA", "G2401251079": "MARCELLO JAVIER PALAGIA", "G2401251082": "Saktiawan Hadi Wijaya", "G2401251084": "Ekha Khoerunisa", "G4401251012": "Muhamad Nurdiyansah", "G4401251026": "Lintang Kasih Fadilla", "G4401251042": "Rizka Shaumi Ramadhana", "G4401251048": "Faaliha Nitisara", "G4401251060": "Aini Shafwana", "G4401251078": "Abudin Sihite", "G4401251089": "Nabila Sharliz Sebayang", "G4401251091": "ANISAH HIKMAT", "G4401251127": "Nova Dwi Rizky", "G4401251133": "Faudzan Lazzuardy Pratama", "G8401251006": "Muhammad Ihsan Alfarabi", "G8401251007": "Amandira Gita Pramesti", "G8401251020": "Hana Adibah Fakhirah Pasaribu", "G8401251028": "Medina Zahra Aulia", "G8401251042": "Nurul Juita Hasanah", "G8401251067": "NUR AZIZAH LUTHFITA", "G8401251077": "PANJI SATRIO PRAKOSO", "G8401251081": "Ahliya Ahmad", "G8401251104": "Khonsa' Naqiyyah Triatmoko", "G8401251107": "Yousita Kheisya Aurella", "G8401251124": "Muhammad Fadhlan Fawwazani Kusmara", "L1401251002": "NATHANIA NASYIWA ZANETHA", "L1401251005": "MUHAMMAD RIZKY RASID SITEPU", "L1401251022": "Raya Putri Bito", "L1401251051": "Diana Shabrina Muthmaina"
+};
+const daftarNIM = Object.keys(dbMahasiswa);
 
-// Daftar NIM tetap sama
-const daftarNIM = [
-  "D1401251011", "D1401251027", "D1401251042", "D1401251052", "D1401251059", "D1401251075", "D1401251080", "D1401251089", "D1401251127", "D2401251004", "D2401251018", "D2401251028", "D2401251055", "D2401251060", "D2401251073", "D2401251091", "D2401251092", "D2401251122", "D2401251123", "D2401251169", "D2401251171", "D3401251004", "D3401251015", "D3401251026", "D3401251050", "D3401251070", "D3401251074", "D3401251082", "D3401251100", "D3401251114", "E2401251027", "E2401251030", "E2401251036", "E2401251039", "E2401251051", "E2401251057", "E2401251067", "E2401251104", "E2401251110", "E3401251019", "E3401251038", "E3401251041", "E3401251056", "E3401251060", "E3401251076", "E3401251080", "E3401251088", "E3401251093", "E3401251120", "E3401251128", "E3401251155", "E3401251163", "E4401251001", "E4401251013", "E4401251037", "E4401251047", "E4401251057", "E4401251074", "E4401251080", "G0401251018", "G0401251019", "G0401251021", "G0401251048", "G2401251006", "G2401251019", "G2401251025", "G2401251041", "G2401251053", "G2401251075", "G2401251079", "G2401251082", "G2401251084", "G4401251012", "G4401251026", "G4401251042", "G4401251048", "G4401251060", "G4401251078", "G4401251089", "G4401251091", "G4401251127", "G4401251133", "G8401251006", "G8401251007", "G8401251020", "G8401251028", "G8401251042", "G8401251067", "G8401251077", "G8401251081", "G8401251104", "G8401251107", "G8401251124", "L1401251002", "L1401251005", "L1401251022", "L1401251051"
-];
+let statusBayar = {};
+let currentMonth = new Date().getMonth() + 1;
 
-// --- VARIABEL ---
-const tableBody = document.getElementById("tableBody");
-const bulanSelect = document.getElementById("bulanSelect");
-const searchBar = document.getElementById("searchBar");
-const paymentForm = document.getElementById("paymentForm");
-const metodeSelect = document.getElementById("metode");
-const buktiInput = document.getElementById("bukti");
-const progressBar = document.getElementById("progressBar");
-const countdownTimer = document.getElementById("countdownTimer");
-const toast = document.getElementById("toast");
-const unpaidCountEl = document.getElementById("unpaidCount");
-const totalKasEl = document.getElementById("totalKasValue");
-const payButton = document.querySelector('.pay-btn'); // Pindahkan tombol ke sini
-
-// Hapus 'localStorage' dan ganti dengan variabel global
-let statusBayar = {}; // Data akan diisi oleh fungsi loadDataFromServer()
-
-// --- FUNGSI ---
-
-// (Fungsi showModal dan close modal DIHAPUS, karena kita pakai link)
-
-// GANTI DENGAN BLOK FUNGSI BARU INI:
-function renderTable(){
-  const bulan = bulanSelect.value;
-  tableBody.innerHTML = "";
-  const filter = searchBar.value.toLowerCase();
-  
-  if (Object.keys(statusBayar).length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>`;
-      return;
-  }
-  
-  daftarNIM.forEach((nim,i)=>{
-    const data = statusBayar[nim]?.[bulan];
-    
-    // --- AWAL LOGIKA BARU UNTUK STATUS ---
-    
-    let statusText = "❌ Belum";
-    let classStatus = "not-paid";
-
-    if (data?.paid === true) {
-      // 1. Cek apakah sudah "Lunas"
-      statusText = "✅ Lunas";
-      classStatus = "checked";
-    } else if (data?.statusText === "Menunggu Konfirmasi") {
-      // 2. Jika tidak lunas, cek apakah "Menunggu Konfirmasi"
-      statusText = "⏳ Menunggu Konfirmasi";
-      classStatus = "pending"; // Ini kelas CSS baru
+// INITIALIZE
+function init() {
+    const v = document.getElementById("bulanSelectView");
+    const f = document.getElementById("bulanSelectForm");
+    v.innerHTML = f.innerHTML; v.value = currentMonth; f.value = currentMonth;
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        document.querySelector('.theme-toggle i').className = 'fa-solid fa-sun';
     }
-    // 3. Jika tidak keduanya, maka akan tetap "❌ Belum"
-    
-    const metode = data?.metode || "-";
-    // Baris ini tetap sama
-    const bukti = data?.bukti ? `<a href="${data.bukti}" target="_blank">Lihat Bukti</a>` : "-";
-    
-    // --- AKHIR LOGIKA BARU UNTUK STATUS ---
-    
-    if(!nim.toLowerCase().includes(filter)) return;
-    
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${i+1}</td><td>${nim}</td><td class="${classStatus}">${statusText}</td><td>${metode}</td><td>${bukti}</td>`;
-    tableBody.appendChild(tr);
-  });
+    loadDataFromServer();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 }
 
+// LOGIC UTAMA
+function loadDataFromServer() {
+    showToast("🔄 Menyinkronkan data...", false);
+    fetch(scriptURL).then(r=>r.json()).then(d=>{
+        statusBayar = d; renderTable(); updateDashboard(); showToast("✅ Data berhasil dimuat!");
+    }).catch(e=>{console.error(e); showToast("❌ Gagal memuat data", true);});
+}
+
+function renderTable() {
+    const bulan = document.getElementById("bulanSelectView").value;
+    const filter = document.getElementById("searchBar").value.toLowerCase();
+    const tb = document.getElementById("tableBody");
+    tb.innerHTML = "";
+    if (Object.keys(statusBayar).length === 0) return;
+
+    let matchCount = 0;
+    daftarNIM.forEach((nim, i) => {
+        const data = statusBayar[nim]?.[bulan];
+        const nama = dbMahasiswa[nim] || "Mahasiswa ST24";
+        if (!nim.toLowerCase().includes(filter) && !nama.toLowerCase().includes(filter)) return;
+
+        matchCount++;
+        let statusBadge = `<span class="badge badge-danger">Belum Bayar</span>`;
+        let metodeText = "-";
+        let aksiBtn = "";
+
+        if (data?.paid) {
+            statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> Lunas</span>`;
+            metodeText = data.metode;
+            if(data.bukti) aksiBtn = `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Lihat Bukti</button>`;
+        } else if (data?.statusText === "Menunggu Konfirmasi") {
+            statusBadge = `<span class="badge badge-warning"><i class="fa-solid fa-hourglass"></i> Pending</span>`;
+            metodeText = data.metode;
+            if(data.bukti) aksiBtn = `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Cek Bukti</button>`;
+        }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${i+1}</td><td><div style="font-weight:600;">${nama}</div><div style="font-size:0.8rem; color:var(--text-gray);">${nim}</div></td><td>${statusBadge}</td><td>${metodeText}</td><td>${aksiBtn}</td>`;
+        tb.appendChild(tr);
+    });
+    if(matchCount===0) tb.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem;">Data tidak ditemukan</td></tr>`;
+}
+
+// --- FITUR BARU: TAGIH GRUP WA ---
+function tagihGrupWA() {
+    const bulanVal = document.getElementById("bulanSelectView").value;
+    const bulanName = document.getElementById("bulanSelectView").options[document.getElementById("bulanSelectView").selectedIndex].text;
+    
+    // Kumpulkan yang belum bayar
+    let listBelumBayar = [];
+    daftarNIM.forEach((nim, index) => {
+        const data = statusBayar[nim]?.[bulanVal];
+        const nama = dbMahasiswa[nim] || "Mahasiswa";
+        
+        // Cek jika belum lunas (Belum ada data, atau paid=false, atau masih pending)
+        if (!data || (!data.paid && data.statusText !== "Menunggu Konfirmasi")) {
+            listBelumBayar.push(`${listBelumBayar.length + 1}. ${nama}`);
+        }
+    });
+
+    if(listBelumBayar.length === 0) {
+        showToast("🎉 Semua mahasiswa sudah bayar bulan ini!");
+        return;
+    }
+
+    // Buat Pesan
+    const header = `*📢 PENGUMUMAN KAS KELAS ST24*\n\nBerikut daftar mahasiswa yang *BELUM* melunasi uang kas untuk bulan *${bulanName}*:\n\n`;
+    const body = listBelumBayar.join("\n");
+    const footer = `\n\nTotal: ${listBelumBayar.length} Mahasiswa.\nMohon segera melakukan pembayaran. Terima kasih 🙏\n\n_Data per ${new Date().toLocaleDateString('id-ID')}_`;
+
+    const fullMessage = encodeURIComponent(header + body + footer);
+    
+    // Buka WhatsApp (Ke Grup) - User harus pilih grup manual setelah WA terbuka
+    window.open(`https://wa.me/?text=${fullMessage}`, '_blank');
+}
 
 function updateDashboard() {
-  const bulan = bulanSelect.value;
-  let bayarCount = 0;
-  let unpaidCount = 0;
-  
-  // Cek jika data belum ter-load
-  if (Object.keys(statusBayar).length === 0) return;
-
-  daftarNIM.forEach(nim => {
-    if (statusBayar[nim]?.[bulan]?.paid) { // Logika ini TETAP SAMA
-      bayarCount++;
-    } else {
-      unpaidCount++;
-    }
-  });
-
-  // 1. Update Total Kas
-  const totalKas = bayarCount * 10000;
-  totalKasEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalKas);
-
-  // 2. Update Belum Bayar
-  unpaidCountEl.textContent = unpaidCount;
-
-  // 3. Update Progress Bar
-  const percent = Math.round((bayarCount / daftarNIM.length) * 100);
-  progressBar.style.width = percent + "%";
-  progressBar.textContent = percent + "%";
+    const bulan = document.getElementById("bulanSelectView").value;
+    let paid = 0;
+    daftarNIM.forEach(nim => { if (statusBayar[nim]?.[bulan]?.paid) paid++; });
+    const total = paid * 10000;
+    document.getElementById("totalKasValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+    document.getElementById("unpaidCount").textContent = daftarNIM.length - paid;
+    const p = Math.round((paid / daftarNIM.length) * 100);
+    document.getElementById("progressBar").style.width = p + "%";
+    document.getElementById("progressText").textContent = p + "% Terkumpul";
 }
 
-// Fungsi countdown dan showToast TETAP SAMA
-function updateCountdown(){
-  const bulan = parseInt(bulanSelect.value);
-  const year = new Date().getFullYear();
-  const daysInMonth = new Date(year, bulan, 0).getDate();
-  const deadline = new Date(year, bulan-1, daysInMonth,23,59,59);
-  const now = new Date();
-  let diff = deadline-now;
-  if(diff<=0){ countdownTimer.textContent="Waktu habis!"; } else {
-    const days=Math.floor(diff/(1000*60*60*24)); const hours=Math.floor((diff/(1000*60*60))%24);
-    const minutes=Math.floor((diff/(1000*60))%60); const seconds=Math.floor((diff/1000)%60);
-    if(days > 0){ countdownTimer.textContent = `${days} hari ${hours} jam`; }
-    else { countdownTimer.textContent = `${hours} jam ${minutes} mnt ${seconds} dtk`; }
-  }
-}
-function showToast(msg, error = false){ 
-  toast.textContent=msg; 
-  toast.style.backgroundColor = error ? "var(--danger-color)" : "#333";
-  toast.classList.add("show"); 
-  setTimeout(()=>{toast.classList.remove("show");}, 3000);
-}
+// FORM SUBMIT
+document.getElementById("paymentForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nim = document.getElementById("nim").value.trim();
+    const bln = document.getElementById("bulanSelectForm").value;
+    const met = document.getElementById("metode").value;
+    const file = document.getElementById("bukti").files[0];
+    const btn = document.querySelector('.pay-btn');
+    if(!daftarNIM.includes(nim)) { showToast("⚠️ NIM tidak terdaftar!", true); return; }
+    if(met==="Transfer" && !file) { showToast("⚠️ Wajib upload bukti!", true); return; }
 
-// --- FUNGSI BARU UNTUK KIRIM DATA ---
-function kirimDataKeServer(dataObject) {
-  // Nonaktifkan tombol saat mengirim
-  payButton.disabled = true;
-  payButton.querySelector('.btn-text').textContent = 'Mengirim...';
-
-  fetch(scriptURL, {
-    method: 'POST',
-    body: JSON.stringify(dataObject)
-  })
-  .then(res => res.json())
-  .then(response => {
-    if (response.result === "success") {
-      showToast(`Pembayaran bulan ${dataObject.bulan} tercatat untuk NIM ${dataObject.nim}.`);
-      paymentForm.reset();
-      buktiInput.style.display = "none";
-      
-      // Muat ulang data dari server untuk update
-      loadDataFromServer(); 
-      
-      // Animasi tombol
-      payButton.classList.add('clicked');
-      setTimeout(() => payButton.classList.remove('clicked'), 400);
-
-    } else {
-      throw new Error(response.message || "Gagal mengirim data");
-    }
-  })
-  .catch(err => {
-    console.error("Error:", err);
-    showToast("Error: " + err.message, true);
-  })
-  .finally(() => {
-    // Aktifkan tombol kembali
-    payButton.disabled = false;
-    payButton.querySelector('.btn-text').textContent = 'sudah bayar';
-  });
-}
-
-// --- EVENT LISTENERS (MODIFIKASI) ---
-metodeSelect.addEventListener("change",()=>{
-  if(metodeSelect.value==="Transfer"){ buktiInput.style.display="block"; }
-  else{ buktiInput.style.display="none"; buktiInput.value=""; }
-});
-
-paymentForm.addEventListener("submit",(e)=>{
-  e.preventDefault();
-  const nim = document.getElementById("nim").value.trim();
-  const metode = metodeSelect.value;
-  const file = buktiInput.files[0];
-  const bulan = bulanSelect.value;
-  
-  // Validasi (tetap sama)
-  if(!daftarNIM.includes(nim)){showToast("NIM tidak terdaftar!", true); return;}
-  if(metode===""){showToast("Pilih metode pembayaran!", true); return;}
-  if(metode==="Transfer" && !file){showToast("Harap upload bukti pembayaran!", true); return;}
-  
-  // HAPUS SEMUA LOGIKA localStorage
-
-  const dataToPost = {
-    nim: nim,
-    bulan: bulan,
-    metode: metode,
-    buktiBase64: null
-  };
-
-  if(file){
-    // Jika ada file, baca sebagai Base64
-    const reader = new FileReader();
-    reader.onload = function(){
-      dataToPost.buktiBase64 = reader.result; // Dapatkan string Base64
-      kirimDataKeServer(dataToPost); // Kirim ke server
+    const oriTxt = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`; btn.disabled = true;
+    const payload = { nim, bulan: bln, metode: met, buktiBase64: null };
+    
+    const send = () => {
+        fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r=>r.json()).then(d=>{
+            if(d.result==="success"){ showToast("✅ Terkirim!"); document.getElementById("paymentForm").reset(); document.getElementById("buktiContainer").style.display="none"; loadDataFromServer(); }
+            else throw new Error(d.message);
+        }).catch(e=>showToast("❌ Error: "+e.message, true)).finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
     };
-    reader.onerror = function() {
-      showToast("Gagal membaca file.", true);
-    }
-    reader.readAsDataURL(file);
-  } else {
-    // Jika tidak ada file (metode Cash)
-    kirimDataKeServer(dataToPost); // Langsung kirim ke server
-  }
+
+    if(file){ const r=new FileReader(); r.onload=function(){payload.buktiBase64=r.result; send();}; r.readAsDataURL(file); } else { send(); }
 });
 
-// Timer tetap sama
-setInterval(()=>{ updateCountdown(); },1000);
-
-// Event listener ini TETAP SAMA
-bulanSelect.addEventListener("change",()=>{ 
-  renderTable(); 
-  updateCountdown(); 
-  updateDashboard(); 
+// AUTOCOMPLETE, THEME, & UTILS
+const nimIn = document.getElementById("nim"); const sugBox = document.getElementById("customSuggestions");
+nimIn.addEventListener('input', function() {
+    const v = this.value.toUpperCase(); sugBox.innerHTML = '';
+    if (!v) { sugBox.style.display = 'none'; return; }
+    const m = daftarNIM.filter(n => n.includes(v) || (dbMahasiswa[n]||"").toUpperCase().includes(v));
+    if (m.length > 0) {
+        sugBox.style.display = 'block';
+        m.slice(0, 10).forEach(n => {
+            const d = document.createElement('div'); d.className = 'suggestion-item';
+            d.innerHTML = `<span>${n}</span> <strong>${dbMahasiswa[n]||"MHS"}</strong>`;
+            d.onclick = () => { nimIn.value = n; document.getElementById("namaDisplay").textContent = dbMahasiswa[n]||""; sugBox.style.display = 'none'; };
+            sugBox.appendChild(d);
+        });
+    } else sugBox.style.display = 'none';
 });
-searchBar.addEventListener("input",()=>{ renderTable(); });
-
-// --- FUNGSI BARU UNTUK MEMUAT DATA DARI SERVER ---
-function loadDataFromServer() {
-  showToast("Memuat data terbaru...");
-  fetch(scriptURL) // Ini adalah request GET
-    .then(res => res.json())
-    .then(data => {
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      
-      // Simpan data dari server ke variabel global
-      statusBayar = data; 
-      
-      // Panggil fungsi render setelah data siap
-      renderTable(); 
-      updateDashboard();
-      showToast("Data berhasil dimuat!");
-    })
-    .catch(err => {
-      console.error("Gagal memuat data:", err);
-      showToast("Gagal memuat data dari server.", true);
-      tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Gagal memuat data. Cek konsol.</td></tr>`;
-    });
+document.onclick = (e) => { if (e.target!==nimIn && e.target!==sugBox) sugBox.style.display = 'none'; };
+document.getElementById("metode").onchange = function(){ document.getElementById("buktiContainer").style.display = this.value==="Transfer"?"block":"none"; };
+function toggleTheme() {
+    const d = document.body.getAttribute('data-theme')==='dark';
+    document.body.setAttribute('data-theme', d?'':'dark'); localStorage.setItem('theme', d?'light':'dark');
+    document.querySelector('.theme-toggle i').className = d?'fa-solid fa-moon':'fa-solid fa-sun';
 }
+function exportToExcel() {
+    let t = document.getElementById("kasTable").cloneNode(true);
+    t.rows[0].deleteCell(4); for(let i=1;i<t.rows.length;i++) if(t.rows[i].cells.length>4) t.rows[i].deleteCell(4);
+    let a = document.createElement("a"); a.href='data:application/vnd.ms-excel,'+ t.outerHTML.replace(/ /g, '%20');
+    a.download=`Laporan_Kas_ST24_${document.getElementById("bulanSelectView").options[document.getElementById("bulanSelectView").selectedIndex].text}.xls`;
+    a.click();
+}
+function updateCountdown(){
+    const b = parseInt(document.getElementById("bulanSelectView").value);
+    const d = new Date(); d.setMonth(b, 0); d.setHours(23,59,59);
+    const diff = d - new Date();
+    document.getElementById("countdownTimer").textContent = diff<=0 ? "Ditutup" : `${Math.floor(diff/86400000)} Hari ${Math.floor((diff/3600000)%24)} Jam`;
+}
+function showToast(m, e=false){ const t=document.getElementById("toast"); t.textContent=m; t.className="toast show"+(e?" error":""); setTimeout(()=>t.classList.remove("show"),3000); }
+const m=document.getElementById("imageModal"); const s=document.querySelector(".close-modal");
+function openModal(src){ m.style.display="flex"; setTimeout(()=>m.classList.add("show"),10); document.getElementById("img01").src=src; }
+s.onclick=()=>m.classList.remove("show"); m.onclick=(e)=>{if(e.target===m)s.onclick()};
+document.getElementById("bulanSelectView").onchange=()=>{renderTable(); updateDashboard(); updateCountdown();};
+document.getElementById("searchBar").oninput=renderTable;
 
-// --- INISIALISASI ---
-// Hapus panggilan render/update lama
-// Panggil fungsi countdown (tidak perlu data)
-updateCountdown(); 
-// Panggil fungsi BARU untuk mengambil data dari server
-loadDataFromServer();
-
+init();
 </script>
 </body>
 </html>
