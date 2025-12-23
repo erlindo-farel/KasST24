@@ -429,7 +429,18 @@ function updateCountdown(){
 function showToast(m, e=false){ const t=document.getElementById("toast"); t.textContent=m; t.className="toast show"+(e?" error":""); setTimeout(()=>t.classList.remove("show"),3000); }
 const m=document.getElementById("imageModal"); const s=document.querySelector(".close-modal");
 function openModal(src){ m.style.display="flex"; setTimeout(()=>m.classList.add("show"),10); document.getElementById("img01").src=src; }
-s.onclick=()=>m.classList.remove("show"); m.onclick=(e)=>{if(e.target===m)s.onclick()};
+// --- GANTI BAGIAN TUTUP MODAL JADI INI ---
+s.onclick = () => {
+    m.classList.remove("show"); // 1. Bikin transparan dulu (Animasi)
+    setTimeout(() => {
+        m.style.display = "none"; // 2. Hilangkan total setelah 0.3 detik
+    }, 300); // Sesuai durasi animasi CSS
+};
+
+m.onclick = (e) => {
+    if (e.target === m) s.onclick(); // Klik background gelap juga menutup
+};
+
 document.getElementById("bulanSelectView").onchange=()=>{renderTable(); updateDashboard(); updateCountdown();};
 document.getElementById("searchBar").oninput=renderTable;
 function adminLoginPrompt() {
