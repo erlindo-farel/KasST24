@@ -78,6 +78,13 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
 .toast.error { background: var(--danger); color: white; }
 .progress-track { height: 10px; background: var(--border-light); border-radius: 5px; overflow: hidden; margin-top: 1rem;}
 .progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #34d399); width: 0%; transition: width 1s ease; }
+/* CSS BUTTON ADMIN */
+.btn-action { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-right: 5px; color: white; }
+.btn-accept { background: var(--success); }
+.btn-reject { background: var(--danger); }
+.btn-action:hover { opacity: 0.8; transform: scale(1.05); }
+.admin-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; vertical-align: middle; margin-left: 5px; }
+
 </style>
 </head>
 <body>
@@ -88,7 +95,16 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
       <h1><i class="fa-solid fa-wallet"></i> Kas Kelas ST24</h1>
       <small style="color:var(--text-gray)">Manajemen Keuangan Transparan</small>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+    
+    <div style="display:flex; gap:10px;">
+    <button class="theme-toggle" onclick="adminLoginPrompt()" title="Login Admin">
+        <i class="fa-solid fa-lock"></i>
+    </button>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+</div>
+
   </header>
 
   <div class="stats-grid">
@@ -207,6 +223,9 @@ const daftarNIM = Object.keys(dbMahasiswa);
 
 let statusBayar = {};
 let currentMonth = new Date().getMonth() + 1;
+let isAdmin = false; // Status default bukan admin
+const adminPass = "satepadang24bks"; // GANTI PASSWORD INI SESUKA KAMU
+
 
 // INITIALIZE
 function init() {
@@ -241,29 +260,65 @@ function renderTable() {
     daftarNIM.forEach((nim, i) => {
         const data = statusBayar[nim]?.[bulan];
         const nama = dbMahasiswa[nim] || "Mahasiswa ST24";
+        
         if (!nim.toLowerCase().includes(filter) && !nama.toLowerCase().includes(filter)) return;
 
         matchCount++;
         let statusBadge = `<span class="badge badge-danger">Belum Bayar</span>`;
         let metodeText = "-";
-        let aksiBtn = "";
+        let aksiBtn = ""; // Default kosong
 
+        // 1. Jika sudah Lunas
         if (data?.paid) {
             statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> Lunas</span>`;
             metodeText = data.metode;
-            if(data.bukti) aksiBtn = `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Lihat Bukti</button>`;
-        } else if (data?.statusText === "Menunggu Konfirmasi") {
+            aksiBtn = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Lihat Bukti</button>` : '';
+            
+            // ADMIN: Bisa batalkan lunas (misal kepencet)
+            if(isAdmin) {
+                aksiBtn += `<br><button class="btn-action btn-reject" onclick="prosesAdmin('${nim}', '${bulan}', 'reject')" style="margin-top:5px;">Batal</button>`;
+            }
+
+        } 
+        // 2. Jika Pending (Menunggu Konfirmasi)
+        else if (data?.statusText === "Menunggu Konfirmasi") {
             statusBadge = `<span class="badge badge-warning"><i class="fa-solid fa-hourglass"></i> Pending</span>`;
             metodeText = data.metode;
-            if(data.bukti) aksiBtn = `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Cek Bukti</button>`;
+            
+            // Link bukti selalu ada
+            let linkBukti = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline; margin-bottom:5px; display:block;" onclick="openModal('${data.bukti}')">Cek Bukti</button>` : '';
+            
+            // LOGIKA ADMIN DISINI
+            if (isAdmin) {
+                aksiBtn = `
+                    ${linkBukti}
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-action btn-accept" onclick="prosesAdmin('${nim}', '${bulan}', 'Lunas')"><i class="fa-solid fa-check"></i></button>
+                        <button class="btn-action btn-reject" onclick="prosesAdmin('${nim}', '${bulan}', 'reject')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            } else {
+                aksiBtn = linkBukti; // User biasa cuma lihat link
+            }
         }
-
+        
+        // Render Baris
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${i+1}</td><td><div style="font-weight:600;">${nama}</div><div style="font-size:0.8rem; color:var(--text-gray);">${nim}</div></td><td>${statusBadge}</td><td>${metodeText}</td><td>${aksiBtn}</td>`;
+        const adminIndicator = isAdmin ? `<span class="admin-badge">ADMIN</span>` : "";
+        
+        tr.innerHTML = `
+            <td>${i+1}</td>
+            <td><div style="font-weight:600;">${nama}</div><div style="font-size:0.8rem; color:var(--text-gray);">${nim}</div></td>
+            <td>${statusBadge}</td>
+            <td>${metodeText}</td>
+            <td>${aksiBtn}</td>
+        `;
         tb.appendChild(tr);
     });
+    
     if(matchCount===0) tb.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem;">Data tidak ditemukan</td></tr>`;
 }
+
 
 // --- FITUR BARU: TAGIH GRUP WA ---
 function tagihGrupWA() {
@@ -377,6 +432,56 @@ function openModal(src){ m.style.display="flex"; setTimeout(()=>m.classList.add(
 s.onclick=()=>m.classList.remove("show"); m.onclick=(e)=>{if(e.target===m)s.onclick()};
 document.getElementById("bulanSelectView").onchange=()=>{renderTable(); updateDashboard(); updateCountdown();};
 document.getElementById("searchBar").oninput=renderTable;
+function adminLoginPrompt() {
+    if (isAdmin) {
+        // Kalau sudah login, jadi logout
+        isAdmin = false;
+        showToast("🔒 Logout berhasil");
+        document.querySelector('.fa-lock').className = 'fa-solid fa-lock'; // Ikon gembok tertutup
+    } else {
+        // Kalau belum login, minta password
+        const pass = prompt("Masukkan Password Admin:");
+        if (pass === adminPass) {
+            isAdmin = true;
+            showToast("🔓 Mode Admin Aktif!");
+            document.querySelector('.fa-lock').className = 'fa-solid fa-lock-open'; // Ikon gembok terbuka
+        } else {
+            showToast("❌ Password salah!", true);
+        }
+    }
+    renderTable(); // Refresh tabel biar tombol muncul
+}
+function prosesAdmin(nim, bulan, actionStatus) {
+    if(!confirm(`Yakin ingin mengubah status menjadi ${actionStatus}?`)) return;
+
+    showToast("⚙️ Memproses...", false);
+    
+    // Payload khusus untuk update
+    const payload = {
+        action: "update_status", // Kode rahasia ke script V6
+        nim: nim,
+        bulan: bulan,
+        status: actionStatus // "Lunas" atau "reject"
+    };
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.result === "success") {
+            showToast("✅ Berhasil diupdate!");
+            loadDataFromServer(); // Refresh data otomatis
+        } else {
+            showToast("❌ Gagal: " + d.message, true);
+        }
+    })
+    .catch(e => {
+        console.error(e);
+        showToast("❌ Error koneksi", true);
+    });
+}
 
 init();
 </script>
