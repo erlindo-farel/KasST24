@@ -6,11 +6,12 @@
 <title>Sistem Keuangan ST24</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-/* --- SETUP CSS (MODERN & CLEAN) --- */
+/* --- SETUP CSS --- */
 :root {
   --primary: #4f46e5; --primary-glow: rgba(79, 70, 229, 0.4); --secondary: #0ea5e9;
   --bg-light: #f3f4f6; --card-light: rgba(255, 255, 255, 0.7);
@@ -31,7 +32,7 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 .brand h1 { margin: 0; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .theme-toggle { background: var(--card-light); border: 1px solid var(--border-light); color: var(--text-dark); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-/* TAB NAVIGATION SYSTEM */
+/* TABS */
 .nav-tabs { display: flex; gap: 10px; margin-bottom: 2rem; background: var(--card-light); padding: 8px; border-radius: 12px; border: 1px solid var(--border-light); backdrop-filter: blur(12px); overflow-x: auto; }
 .tab-btn { flex: 1; background: transparent; border: none; color: var(--text-gray); font-weight: 600; padding: 12px 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
 .tab-btn:hover { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
@@ -41,33 +42,51 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
 /* CARDS & STATS */
-.glass-card { background: var(--card-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-light); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.stat-box { background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 1rem; }
+.glass-card { background: var(--card-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.stat-box { background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 1rem; margin-bottom: 0; }
 [data-theme="dark"] .stat-box { background: rgba(30, 41, 59, 0.5); }
 .stat-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-glow); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
 .stat-info h4 { margin: 0; font-size: 0.85rem; color: var(--text-gray); font-weight: 500; }
 .stat-info span { font-size: 1.25rem; font-weight: 700; color: var(--text-dark); }
 
-/* SPLIT LAYOUT FOR PAYMENT TAB */
+/* ACCORDION */
+.accordion-item { padding: 1.25rem 1.5rem; }
+.accordion-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.accordion-header:hover h3 { color: var(--primary); }
+.accordion-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-dark); transition: color 0.3s; display: flex; align-items: center; gap: 10px; }
+.accordion-icon { font-size: 1.2rem; color: var(--text-gray); transition: transform 0.4s; }
+.accordion-header.active .accordion-icon { transform: rotate(180deg); color: var(--primary); }
+.accordion-content { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.5s ease-in-out, opacity 0.4s, margin-top 0.4s; }
+.accordion-content.open { opacity: 1; margin-top: 1.5rem; overflow: visible; } /* To allow popped money to show */
+
+/* EFEK HARTA KARUN */
+.treasure-section { text-align: center; border: 2px dashed var(--warning); padding: 2.5rem 1rem 1rem 1rem; border-radius: 16px; cursor: pointer; transition: transform 0.3s, background 0.3s; margin-bottom: 1.5rem; position: relative; overflow: visible; }
+[data-theme="dark"] .treasure-section { background: rgba(30, 41, 59, 0.5); }
+.treasure-section:hover { transform: scale(1.02); background: rgba(245, 158, 11, 0.1); }
+.chest-img { width: 140px; height: auto; position: relative; z-index: 5; transition: transform 0.2s; }
+.treasure-section:active .chest-img { transform: scale(0.95); }
+.treasure-amount { font-size: 2.5rem; font-weight: 800; color: var(--success); position: absolute; top: 30%; left: 50%; transform: translate(-50%, 0) scale(0); opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 6; white-space: nowrap; text-shadow: 0 4px 15px rgba(255, 255, 255, 0.8); background: var(--card-light); padding: 5px 15px; border-radius: 12px; border: 2px solid var(--success); }
+.treasure-amount.show { transform: translate(-50%, -100px) scale(1); opacity: 1; }
+#particlesContainer { position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.money-particle { position: absolute; font-size: 1.8rem; left: 50%; bottom: 40%; opacity: 0; z-index: 4; pointer-events: none; animation: popMoney 1s ease-out forwards; }
+@keyframes popMoney {
+    0% { transform: translate(-50%, 0) scale(0.5); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot)); opacity: 0; }
+}
+
+/* OTHERS */
 .payment-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; }
 @media(max-width: 768px) { .payment-grid { grid-template-columns: 1fr; } .nav-tabs { flex-direction: column; } .tab-btn { justify-content: flex-start; } }
-
-/* BUTTONS */
-.pay-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; color: white; transition: transform 0.2s; border: none; cursor: pointer; }
-.pay-link-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.pay-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 600; color: white; border: none; cursor: pointer; }
 .btn-primary { background: linear-gradient(135deg, var(--primary), #4338ca); color: white; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.8rem 1rem; border-radius: 10px; width: 100%; }
-
-/* INPUTS */
 .input-group { margin-bottom: 1rem; position: relative; }
 label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
 input, select { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--border-light); background: rgba(255, 255, 255, 0.8); color: var(--text-dark); outline: none; }
 [data-theme="dark"] input, [data-theme="dark"] select { background: rgba(15, 23, 42, 0.6); }
 .suggestion-box { position: absolute; top: 100%; left: 0; width: 100%; background: var(--card-light); border: 1px solid var(--border-light); border-radius: 0 0 10px 10px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none; backdrop-filter: blur(20px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-.suggestion-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; display: flex; justify-content: space-between; }
+.suggestion-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid var(--border-light); }
 .suggestion-item:hover { background: var(--primary-glow); color: var(--primary); }
-
-/* TABLE */
 .table-container { overflow-x: auto; border-radius: 12px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
@@ -77,12 +96,7 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
 .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
 .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 .badge-denda { background: rgba(239, 68, 68, 0.8); color: white; margin-top: 5px; display: inline-block; font-size: 0.7rem; }
-
-/* WA BUTTON STYLE */
 .btn-wa-group { background: var(--wa-color); color: white; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 600; margin-left: auto; }
-.btn-wa-group:hover { background: #1ebc57; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
-
-/* UTILS & ADMIN */
 .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
 .modal.show { display: flex; opacity: 1; }
 .modal-content { max-width: 90%; max-height: 90%; border-radius: 8px; }
@@ -95,8 +109,7 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
 .btn-action { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-right: 5px; color: white; }
 .btn-accept { background: var(--success); }
 .btn-reject { background: var(--danger); }
-.btn-action:hover { opacity: 0.8; transform: scale(1.05); }
-.admin-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; vertical-align: middle; margin-left: 5px; }
+.custom-modal-box { background: var(--card-light); padding: 2rem; border-radius: 16px; width: 90%; max-width: 400px; position: relative; border: 1px solid var(--border-light); backdrop-filter: blur(15px); }
 </style>
 </head>
 <body>
@@ -126,30 +139,79 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
   </nav>
 
   <div id="tab-dashboard" class="tab-content active">
-      <div class="stats-grid">
-        <div class="glass-card stat-box">
-          <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
-          <div class="stat-info"><h4>Total Kas</h4><span id="totalKasValue">Rp 0</span></div>
-        </div>
-        <div class="glass-card stat-box">
-          <div class="stat-icon" style="background: rgba(239,68,68,0.2); color: var(--danger)"><i class="fa-solid fa-user-xmark"></i></div>
-          <div class="stat-info"><h4>Belum Bayar</h4><span id="unpaidCount">0</span></div>
-        </div>
-        <div class="glass-card stat-box">
-          <div class="stat-icon" style="background: rgba(245,158,11,0.2); color: var(--warning)"><i class="fa-solid fa-clock"></i></div>
-          <div class="stat-info"><h4>Deadline</h4><span id="countdownTimer" style="font-size: 1rem;">Memuat...</span></div>
-        </div>
+      
+      <div id="treasure-section" class="glass-card treasure-section" onclick="toggleTreasure()">
+        <div id="treasureAmount" class="treasure-amount"><span id="saldoValue">Rp 0</span></div>
+        <div id="particlesContainer"></div>
+        <img id="chestImg" src="1.png" alt="Peti Harta Tertutup" class="chest-img">
+        <h4 style="margin: 10px 0 5px 0; color: var(--text-dark);">Total Kas Saat Ini</h4>
+        <p id="chestHint" style="font-size: 0.8rem; color: var(--warning); margin: 0;">Klik untuk membuka peti!</p>
       </div>
 
-      <div class="glass-card">
-        <h3 style="margin-top:0;"><i class="fa-solid fa-bars-progress"></i> Progress Pengumpulan Kas</h3>
-        <p style="color:var(--text-gray); font-size:0.9rem;">Bulan aktif: <span id="dashboardMonthDisplay" style="font-weight:bold; color:var(--primary);"></span></p>
-        <div style="margin-top:1.5rem;">
-          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
-            <span>Target Terkumpul</span><span id="progressText">0%</span>
+      <div class="glass-card accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+              <h3><i class="fa-solid fa-earth-asia" style="color:var(--primary)"></i> Pemasukan & Pengeluaran (Semua Bulan)</h3>
+              <i class="fa-solid fa-chevron-down accordion-icon"></i>
           </div>
-          <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
-        </div>
+          <div class="accordion-content">
+              <div class="stats-grid">
+                <div class="stat-box">
+                  <div class="stat-icon" style="background: rgba(14, 165, 233, 0.2); color: var(--secondary);"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                  <div class="stat-info"><h4>Total Pemasukan</h4><span id="totalPemasukanValue">Rp 0</span></div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-icon" style="background: rgba(239,68,68,0.2); color: var(--danger)"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                  <div class="stat-info"><h4>Total Pengeluaran</h4><span id="totalPengeluaranValue">Rp 0</span></div>
+                </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="glass-card accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+              <h3><i class="fa-solid fa-receipt" style="color:var(--danger)"></i> Riwayat Pengeluaran Kelas</h3>
+              <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content">
+              <div style="display:flex; justify-content:flex-end; margin-bottom: 1rem;">
+                  <button id="btnTambahPengeluaran" class="btn-primary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; display: none;" onclick="bukaModalPengeluaran()">
+                      <i class="fa-solid fa-plus"></i> Tambah Pengeluaran
+                  </button>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Nominal</th></tr></thead>
+                  <tbody id="tabelPengeluaranBody"></tbody>
+                </table>
+              </div>
+          </div>
+      </div>
+
+      <div class="glass-card accordion-item">
+          <div class="accordion-header active" onclick="toggleAccordion(this)">
+              <h3><i class="fa-regular fa-calendar-check" style="color:var(--success)"></i> Statistik Bulan:&nbsp;<span id="dashboardMonthDisplay" style="color:var(--primary); font-weight:bold;"></span></h3>
+              <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content open" style="max-height: 1000px; opacity: 1; margin-top: 1.5rem;">
+              <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                <div class="stat-box">
+                  <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+                  <div class="stat-info"><h4>Kas Terkumpul</h4><span id="totalKasBulanIni">Rp 0</span></div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-icon" style="background: rgba(239,68,68,0.2); color: var(--danger)"><i class="fa-solid fa-user-xmark"></i></div>
+                  <div class="stat-info"><h4>Belum Bayar</h4><span id="unpaidCount">0</span></div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-icon" style="background: rgba(245,158,11,0.2); color: var(--warning)"><i class="fa-solid fa-clock"></i></div>
+                  <div class="stat-info"><h4>Sisa Waktu</h4><span id="countdownTimer" style="font-size: 1rem;">Memuat...</span></div>
+                </div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+                <span>Target Pengumpulan Bulan Ini</span><span id="progressText">0%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+          </div>
       </div>
   </div>
 
@@ -162,9 +224,6 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
             <img src="qris.jpg" alt="QRIS Kas Kelas" class="qris-img" style="width:100%; max-width:250px; border-radius:12px; border: 2px solid var(--text-dark);">
             <p style="margin-top:10px; font-weight:600; color:var(--primary); font-size:0.9rem;">a.n Siti Zahrah Salamah</p>
           </div>
-          <a href="qris.jpg" download="QRIS_Kas_ST24.jpg" class="pay-link-btn" style="background:var(--text-dark); width:100%; text-decoration:none;">
-              <i class="fa-solid fa-download"></i> Simpan Gambar QRIS
-          </a>
         </div>
 
         <div class="glass-card">
@@ -241,7 +300,7 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
             <div class="stat-info">
                 <h4>Bendahara Umum</h4>
                 <span style="font-size: 1.2rem; display: block; margin: 5px 0;">Siti Zahrah Salamah</span>
-                <p style="font-size: 0.85rem; color: var(--text-gray); margin: 0;">Tanya-tanya soal kas atau konfirmasi pembayaran langsung ke sini yaa.</p>
+                <p style="font-size: 0.85rem; color: var(--text-gray); margin: 0;">Tanya-tanya soal kas atau konfirmasi bayar langsung ke sini yaa.</p>
             </div>
             <a href="https://wa.me/6285157705502" target="_blank" class="btn-wa-group" style="justify-content: center; margin-top: auto;">
                 <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
@@ -266,29 +325,87 @@ th { background: rgba(var(--primary), 0.05); font-weight: 600; color: var(--text
 
 </div>
 
-<div id="imageModal" class="modal"><span class="close-modal">&times;</span><img class="modal-content" id="img01"></div>
+<div id="imageModal" class="modal" onclick="if(event.target===this)tutupModalGambar()"><span class="close-modal" onclick="tutupModalGambar()">&times;</span><img class="modal-content" id="img01"></div>
+
+<div id="modalFormPengeluaran" class="modal">
+    <div class="custom-modal-box">
+        <span class="close-modal" style="color:var(--text-dark); right: 20px; top: 15px;" onclick="tutupModalPengeluaran()">&times;</span>
+        <h3 style="margin-top:0; border-bottom:1px solid var(--border-light); padding-bottom: 0.5rem;">Catat Pengeluaran</h3>
+        <form id="formInputPengeluaran">
+            <div class="input-group"><label>Tanggal</label><input type="date" id="tglPengeluaran" required></div>
+            <div class="input-group"><label>Keterangan / Beli Apa</label><input type="text" id="ketPengeluaran" required></div>
+            <div class="input-group"><label>Nominal Harga (Rp)</label><input type="number" id="nomPengeluaran" min="500" required></div>
+            <button type="submit" class="btn-primary" style="margin-top: 1.5rem;"><i class="fa-solid fa-save"></i> Simpan Data</button>
+        </form>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
 // --- KONFIGURASI ---
 const scriptURL = "https://script.google.com/macros/s/AKfycbxLx5KhI0lpPAx_8HaWdYO1iN_Hr9Ao75S7WXtiZvLm2ggotcvCe-vhAwhQkUxTYKU3Zg/exec"; 
-
-const dbMahasiswa = {
-"D1401251011": "Nicolas Alfredo Siahaan", "D1401251027": "DELVINA MAHARANI AZZAHRA", "D1401251042": "Wulan Ramadani", "D1401251052": "Muthia Alina Satifa", "D1401251059": "LIAN KUSUMA WARDANA", "D1401251075": "RADHWA RHASYKA", "D1401251080": "NAUFAL RASYID PUTRATAMA", "D1401251089": "Afif Auryan Nizham", "D1401251127": "MUHAMMAD JAUHAR FIKRI", "D2401251004": "DANANG SUTA WIJAYA", "D2401251018": "Nikolaus Kevin Blay", "D2401251028": "FARENZA NAYLA CHANDRA AUDHEA", "D2401251055": "NABILLA ALDENIA JOHANITHANS SCHOLASTIKA", "D2401251060": "VANNYA SYABANI IRAWAN", "D2401251073": "Sabrina Salsabila Nurmawati", "D2401251091": "Dwi Darmawan", "D2401251092": "SHAFA KHALISYA", "D2401251122": "GANIA INDRI MAHARANI", "D2401251123": "Bungaros Handayani Azzahra Mahmudi", "D2401251169": "Arizki Rahma Zavira", "D2401251171": "JORDAN HARTANTA S. MELIALA", "D3401251004": "DANDY FAREL KENEDY", "D3401251015": "SITI ZAHRAH SALAMAH", "D3401251026": "MAULIDA KHAIRUL NISAH", "D3401251050": "NAILAH KHAIRUN NISA", "D3401251070": "REVA WALIDAH", "D3401251074": "DHIYA DAFFA PRANATANING LARAS", "D3401251082": "FATHIMAH DZIKRO AMANI", "D3401251100": "Raka Kinandita Pinayungan", "D3401251114": "Vonni Asma Nabilah", "E2401251027": "Laily Rasyidah", "E2401251030": "Rieva Septera Putra Budi", "E2401251036": "I PUTU RAKA NUR BINEDA SAMIPUTRA", "E2401251039": "Sistiana Sri Wahyuni", "E2401251051": "Denta Daun Syafanira", "E2401251057": "MATHEW MAXIMUS FEBRILIANT SAMOSIR", "E2401251067": "VIKA MUFLIHAH", "E2401251104": "Kayla Azzahra", "E2401251110": "David Isai Mangera", "E3401251019": "Dedi Sulaiman", "E3401251038": "Fadila Destiana Johannita", "E3401251041": "Tiara Cahya Azizah", "E3401251056": "Rohmi Hud Fakhri", "E3401251060": "Maesaroh", "E3401251076": "AUFA RAFIQI", "E3401251080": "SIMORANGKIR, MEISCHA ASHIVA JOSEPHINE", "E3401251088": "MUTIA ZHARFA RAFIFAH", "E3401251093": "ANITA MEILANI", "E3401251120": "Muhamad Dewandra", "E3401251128": "M. Zilvan Al-Afat", "E3401251155": "Shafa Riyana Maharani", "E3401251163": "Faiq Abdus Salam", "E4401251001": "Nola Kamania Elisa Situmorang", "E4401251013": "Elyasa Firdaus", "E4401251037": "Bilqis Bonit Zulova", "E4401251047": "Azlilatun Khasanah", "E4401251057": "Muhammad Rayhan Alfarizqy Sugadna Budi", "E4401251074": "ADILA NAWAL SYARIF", "E4401251080": "MAULANA DZIKRULLAAH", "G0401251018": "Stevie Johan", "G0401251019": "Alifa Taqiyya", "G0401251021": "Syauqi Bariqullah Nasution", "G0401251048": "Ihsan Mufid Akram", "G2401251006": "Farel Erlindo", "G2401251019": "Nailah Nur Rahman", "G2401251025": "Radithya Devarel Setiawan", "G2401251041": "Aufa Hudzaifa Haura", "G2401251053": "HANIFA AZ ZAHRA", "G2401251075": "ADIA FIRLY ZALIKA", "G2401251079": "MARCELLO JAVIER PALAGIA", "G2401251082": "Saktiawan Hadi Wijaya", "G2401251084": "Ekha Khoerunisa", "G4401251012": "Muhamad Nurdiyansah", "G4401251026": "Lintang Kasih Fadilla", "G4401251042": "Rizka Shaumi Ramadhana", "G4401251048": "Faaliha Nitisara", "G4401251060": "Aini Shafwana", "G4401251078": "Abudin Sihite", "G4401251089": "Nabila Sharliz Sebayang", "G4401251091": "ANISAH HIKMAT", "G4401251127": "Nova Dwi Rizky", "G4401251133": "Faudzan Lazzuardy Pratama", "G8401251006": "Muhammad Ihsan Alfarabi", "G8401251007": "Amandira Gita Pramesti", "G8401251020": "Hana Adibah Fakhirah Pasaribu", "G8401251028": "Medina Zahra Aulia", "G8401251042": "Nurul Juita Hasanah", "G8401251067": "NUR AZIZAH LUTHFITA", "G8401251077": "PANJI SATRIO PRAKOSO", "G8401251081": "Ahliya Ahmad", "G8401251104": "Khonsa' Naqiyyah Triatmoko", "G8401251107": "Yousita Kheisya Aurella", "G8401251124": "Muhammad Fadhlan Fawwazani Kusmara", "L1401251002": "NATHANIA NASYIWA ZANETHA", "L1401251005": "MUHAMMAD RIZKY RASID SITEPU", "L1401251022": "Raya Putri Bito", "L1401251051": "Diana Shabrina Muthmaina"
-};
+const dbMahasiswa = { "D1401251011": "Nicolas Alfredo Siahaan", "D1401251027": "DELVINA MAHARANI AZZAHRA", "D1401251042": "Wulan Ramadani", "D1401251052": "Muthia Alina Satifa", "D1401251059": "LIAN KUSUMA WARDANA", "D1401251075": "RADHWA RHASYKA", "D1401251080": "NAUFAL RASYID PUTRATAMA", "D1401251089": "Afif Auryan Nizham", "D1401251127": "MUHAMMAD JAUHAR FIKRI", "D2401251004": "DANANG SUTA WIJAYA", "D2401251018": "Nikolaus Kevin Blay", "D2401251028": "FARENZA NAYLA CHANDRA AUDHEA", "D2401251055": "NABILLA ALDENIA JOHANITHANS SCHOLASTIKA", "D2401251060": "VANNYA SYABANI IRAWAN", "D2401251073": "Sabrina Salsabila Nurmawati", "D2401251091": "Dwi Darmawan", "D2401251092": "SHAFA KHALISYA", "D2401251122": "GANIA INDRI MAHARANI", "D2401251123": "Bungaros Handayani Azzahra Mahmudi", "D2401251169": "Arizki Rahma Zavira", "D2401251171": "JORDAN HARTANTA S. MELIALA", "D3401251004": "DANDY FAREL KENEDY", "D3401251015": "SITI ZAHRAH SALAMAH", "D3401251026": "MAULIDA KHAIRUL NISAH", "D3401251050": "NAILAH KHAIRUN NISA", "D3401251070": "REVA WALIDAH", "D3401251074": "DHIYA DAFFA PRANATANING LARAS", "D3401251082": "FATHIMAH DZIKRO AMANI", "D3401251100": "Raka Kinandita Pinayungan", "D3401251114": "Vonni Asma Nabilah", "E2401251027": "Laily Rasyidah", "E2401251030": "Rieva Septera Putra Budi", "E2401251036": "I PUTU RAKA NUR BINEDA SAMIPUTRA", "E2401251039": "Sistiana Sri Wahyuni", "E2401251051": "Denta Daun Syafanira", "E2401251057": "MATHEW MAXIMUS FEBRILIANT SAMOSIR", "E2401251067": "VIKA MUFLIHAH", "E2401251104": "Kayla Azzahra", "E2401251110": "David Isai Mangera", "E3401251019": "Dedi Sulaiman", "E3401251038": "Fadila Destiana Johannita", "E3401251041": "Tiara Cahya Azizah", "E3401251056": "Rohmi Hud Fakhri", "E3401251060": "Maesaroh", "E3401251076": "AUFA RAFIQI", "E3401251080": "SIMORANGKIR, MEISCHA ASHIVA JOSEPHINE", "E3401251088": "MUTIA ZHARFA RAFIFAH", "E3401251093": "ANITA MEILANI", "E3401251120": "Muhamad Dewandra", "E3401251128": "M. Zilvan Al-Afat", "E3401251155": "Shafa Riyana Maharani", "E3401251163": "Faiq Abdus Salam", "E4401251001": "Nola Kamania Elisa Situmorang", "E4401251013": "Elyasa Firdaus", "E4401251037": "Bilqis Bonit Zulova", "E4401251047": "Azlilatun Khasanah", "E4401251057": "Muhammad Rayhan Alfarizqy Sugadna Budi", "E4401251074": "ADILA NAWAL SYARIF", "E4401251080": "MAULANA DZIKRULLAAH", "G0401251018": "Stevie Johan", "G0401251019": "Alifa Taqiyya", "G0401251021": "Syauqi Bariqullah Nasution", "G0401251048": "Ihsan Mufid Akram", "G2401251006": "Farel Erlindo", "G2401251019": "Nailah Nur Rahman", "G2401251025": "Radithya Devarel Setiawan", "G2401251041": "Aufa Hudzaifa Haura", "G2401251053": "HANIFA AZ ZAHRA", "G2401251075": "ADIA FIRLY ZALIKA", "G2401251079": "MARCELLO JAVIER PALAGIA", "G2401251082": "Saktiawan Hadi Wijaya", "G2401251084": "Ekha Khoerunisa", "G4401251012": "Muhamad Nurdiyansah", "G4401251026": "Lintang Kasih Fadilla", "G4401251042": "Rizka Shaumi Ramadhana", "G4401251048": "Faaliha Nitisara", "G4401251060": "Aini Shafwana", "G4401251078": "Abudin Sihite", "G4401251089": "Nabila Sharliz Sebayang", "G4401251091": "ANISAH HIKMAT", "G4401251127": "Nova Dwi Rizky", "G4401251133": "Faudzan Lazzuardy Pratama", "G8401251006": "Muhammad Ihsan Alfarabi", "G8401251007": "Amandira Gita Pramesti", "G8401251020": "Hana Adibah Fakhirah Pasaribu", "G8401251028": "Medina Zahra Aulia", "G8401251042": "Nurul Juita Hasanah", "G8401251067": "NUR AZIZAH LUTHFITA", "G8401251077": "PANJI SATRIO PRAKOSO", "G8401251081": "Ahliya Ahmad", "G8401251104": "Khonsa' Naqiyyah Triatmoko", "G8401251107": "Yousita Kheisya Aurella", "G8401251124": "Muhammad Fadhlan Fawwazani Kusmara", "L1401251002": "NATHANIA NASYIWA ZANETHA", "L1401251005": "MUHAMMAD RIZKY RASID SITEPU", "L1401251022": "Raya Putri Bito", "L1401251051": "Diana Shabrina Muthmaina" };
 const daftarNIM = Object.keys(dbMahasiswa);
 
+let riwayatPengeluaran = [];
 let statusBayar = {};
 let currentMonth = new Date().getMonth() + 1;
 let isAdmin = false; 
 const adminPass = "satepadang24bks";
 
-// FUNGSI PINDAH TAB
+// FUNGSI UMUM & ACCORDION
 function switchTab(tabId, btnElement) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     if(btnElement) btnElement.classList.add('active');
+}
+function toggleAccordion(headerElement) {
+    const content = headerElement.nextElementSibling;
+    headerElement.classList.toggle('active');
+    if (content.classList.contains('open')) {
+        content.style.maxHeight = '0px'; content.classList.remove('open');
+    } else {
+        content.classList.add('open'); content.style.maxHeight = content.scrollHeight + 150 + "px"; 
+    }
+}
+
+// EFEK PETI HARTA KARUN
+let isChestOpen = false;
+function toggleTreasure() {
+    const img = document.getElementById("chestImg");
+    const amt = document.getElementById("treasureAmount");
+    const hint = document.getElementById("chestHint");
+    const container = document.getElementById("particlesContainer");
+
+    if (!isChestOpen) {
+        img.src = "2.png"; // Peti Terbuka
+        amt.classList.add("show");
+        hint.textContent = "Klik peti untuk menutup";
+        
+        // Buat hujan uang
+        for(let i=0; i<12; i++) {
+            let money = document.createElement("div");
+            money.innerHTML = ["💵","💰","🪙","💸","✨"][Math.floor(Math.random()*5)];
+            money.className = "money-particle";
+            let tx = (Math.random() - 0.5) * 250 + "px"; // arah sebaran X
+            let ty = (Math.random() * -150 - 50) + "px"; // arah lompat Y
+            let rot = (Math.random() * 360) + "deg"; // putaran
+            money.style.setProperty('--tx', tx);
+            money.style.setProperty('--ty', ty);
+            money.style.setProperty('--rot', rot);
+            container.appendChild(money);
+            
+            setTimeout(() => money.remove(), 1000); // hilang setelah 1 detik
+        }
+        isChestOpen = true;
+    } else {
+        img.src = "1.png"; // Peti Tertutup
+        amt.classList.remove("show");
+        hint.textContent = "Klik untuk membuka peti!";
+        isChestOpen = false;
+    }
 }
 
 function init() {
@@ -311,7 +428,7 @@ function loadDataFromServer() {
     }).catch(e=>{console.error(e); showToast("❌ Gagal memuat data", true);});
 }
 
-// LOGIKA DENDA & TABEL
+// LOGIKA TABEL
 function renderTable() {
     const bulan = document.getElementById("bulanSelectView").value;
     const filter = document.getElementById("searchBar").value.toLowerCase();
@@ -319,130 +436,152 @@ function renderTable() {
     tb.innerHTML = "";
     if (Object.keys(statusBayar).length === 0) return;
 
-    // Hitung apakah bulan yang dipilih sudah melewati batas deadline (akhir bulan)
-    const deadlineDate = new Date(); 
-    deadlineDate.setMonth(bulan, 0); 
-    deadlineDate.setHours(23,59,59);
+    const deadlineDate = new Date(); deadlineDate.setMonth(bulan, 0); deadlineDate.setHours(23,59,59);
     const isPastDeadline = (deadlineDate - new Date()) <= 0;
 
     let matchCount = 0;
     daftarNIM.forEach((nim, i) => {
         const data = statusBayar[nim]?.[bulan];
         const nama = dbMahasiswa[nim] || "Mahasiswa ST24";
-        
         if (!nim.toLowerCase().includes(filter) && !nama.toLowerCase().includes(filter)) return;
         matchCount++;
         
-        // Status Default
         let statusBadge = `<span class="badge badge-danger">Belum Bayar</span>`;
-        
-        // --- LOGIKA DENDA ---
-        // Jika belum lunas, tidak pending, dan sudah lewat deadline
-        if (!data?.paid && data?.statusText !== "Menunggu Konfirmasi" && isPastDeadline) {
-            statusBadge += `<br><span class="badge badge-denda"><i class="fa-solid fa-circle-exclamation"></i> Denda Rp 5.000</span>`;
-        }
-
-        let metodeText = "-";
-        let aksiBtn = "";
+        let metodeText = "-"; let aksiBtn = "";
 
         if (data?.paid) {
             statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> Lunas</span>`;
             metodeText = data.metode;
-            aksiBtn = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="bukaBuktiGambar('${nim}', '${bulan}')">Lihat Bukti</button>` : '';
+            aksiBtn = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline;" onclick="openModal('${data.bukti}')">Lihat Bukti</button>` : '';
             if(isAdmin) aksiBtn += `<br><button class="btn-action btn-reject" onclick="prosesAdmin('${nim}', '${bulan}', 'reject')" style="margin-top:5px;">Batal</button>`;
-        } 
-        else if (data?.statusText === "Menunggu Konfirmasi") {
+        } else if (data?.statusText === "Menunggu Konfirmasi") {
             statusBadge = `<span class="badge badge-warning"><i class="fa-solid fa-hourglass"></i> Pending</span>`;
             metodeText = data.metode;
-            let linkBukti = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline; margin-bottom:5px; display:block;" onclick="bukaBuktiGambar('${nim}', '${bulan}')">Cek Bukti</button>` : '';
+            let linkBukti = data.bukti ? `<button class="btn-primary btn-small" style="background:none; color:var(--primary); border:none; padding:0; text-decoration:underline; margin-bottom:5px; display:block;" onclick="openModal('${data.bukti}')">Cek Bukti</button>` : '';
             if (isAdmin) {
                 aksiBtn = `${linkBukti}<div style="display:flex; gap:5px;"><button class="btn-action btn-accept" onclick="prosesAdmin('${nim}', '${bulan}', 'Lunas')"><i class="fa-solid fa-check"></i></button><button class="btn-action btn-reject" onclick="prosesAdmin('${nim}', '${bulan}', 'reject')"><i class="fa-solid fa-xmark"></i></button></div>`;
-            } else {
-                aksiBtn = linkBukti;
-            }
+            } else aksiBtn = linkBukti;
         }
+
+        if (!data?.paid && isPastDeadline) { statusBadge += `<br><span class="badge badge-denda"><i class="fa-solid fa-circle-exclamation"></i> + Denda Rp 5.000</span>`; }
         
         const tr = document.createElement("tr");
         tr.innerHTML = `<td>${i+1}</td><td><div style="font-weight:600;">${nama}</div><div style="font-size:0.8rem; color:var(--text-gray);">${nim}</div></td><td>${statusBadge}</td><td>${metodeText}</td><td>${aksiBtn}</td>`;
         tb.appendChild(tr);
     });
-    
     if(matchCount===0) tb.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem;">Data tidak ditemukan</td></tr>`;
 }
 
-// LOGIKA WA GRUP DENGAN INFO DENDA
-function tagihGrupWA() {
-    const bulanVal = document.getElementById("bulanSelectView").value;
-    const bulanName = document.getElementById("bulanSelectView").options[document.getElementById("bulanSelectView").selectedIndex].text;
-    
-    const deadlineDate = new Date(); deadlineDate.setMonth(parseInt(bulanVal), 0); deadlineDate.setHours(23,59,59);
-    const isPastDeadline = (deadlineDate - new Date()) <= 0;
-
-    let listBelumBayar = [];
-    daftarNIM.forEach((nim, index) => {
-        const data = statusBayar[nim]?.[bulanVal];
-        const nama = dbMahasiswa[nim] || "Mahasiswa";
-        
-        if (!data || (!data.paid && data.statusText !== "Menunggu Konfirmasi")) {
-            let infoDenda = isPastDeadline ? " *(+ Denda Rp 5.000)*" : "";
-            listBelumBayar.push(`${listBelumBayar.length + 1}. ${nama}${infoDenda}`);
-        }
-    });
-
-    if(listBelumBayar.length === 0) { showToast("🎉 Semua mahasiswa sudah bayar bulan ini!"); return; }
-    
-    const header = `*📢 PENGUMUMAN KAS KELAS ST24*\n\nBerikut daftar mahasiswa yang *BELUM* melunasi uang kas untuk bulan *${bulanName}*:\n\n`;
-    const body = listBelumBayar.join("\n");
-    const footer = `\n\nTotal: ${listBelumBayar.length} Mahasiswa.\nMohon segera melakukan pembayaran${isPastDeadline ? " beserta dendanya" : ""}. Terima kasih 🙏\n\n_Data per ${new Date().toLocaleDateString('id-ID')}_`;
-    
-    window.open(`https://wa.me/?text=${encodeURIComponent(header + body + footer)}`, '_blank');
-}
-
+// LOGIKA DASHBOARD
 function updateDashboard() {
     const bulanSelect = document.getElementById("bulanSelectView");
-    const bulanName = bulanSelect.options[bulanSelect.selectedIndex].text;
     const bulan = bulanSelect.value;
+    document.getElementById("dashboardMonthDisplay").textContent = bulanSelect.options[bulanSelect.selectedIndex].text;
     
-    document.getElementById("dashboardMonthDisplay").textContent = bulanName;
+    // STATISTIK BULAN INI
+    let paidBulanIni = 0;
+    daftarNIM.forEach(nim => { if (statusBayar[nim]?.[bulan]?.paid) paidBulanIni++; });
+    document.getElementById("totalKasBulanIni").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(paidBulanIni * 10000);
+    document.getElementById("unpaidCount").textContent = daftarNIM.length - paidBulanIni;
+    const progressPerc = Math.round((paidBulanIni / daftarNIM.length) * 100);
+    document.getElementById("progressBar").style.width = progressPerc + "%";
+    document.getElementById("progressText").textContent = progressPerc + "% Terkumpul";
+
+    // STATISTIK GLOBAL (PETI HARTA)
+    let totalPemasukanGlobal = 0;
+    daftarNIM.forEach(nim => {
+        if (statusBayar[nim]) { Object.keys(statusBayar[nim]).forEach(bln => { if (statusBayar[nim][bln].paid) totalPemasukanGlobal += 10000; }); }
+    });
+    let totalPengeluaran = 0;
+    riwayatPengeluaran.forEach(item => { totalPengeluaran += item.nominal; });
     
-    let paid = 0;
-    daftarNIM.forEach(nim => { if (statusBayar[nim]?.[bulan]?.paid) paid++; });
-    const total = paid * 10000;
-    document.getElementById("totalKasValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
-    document.getElementById("unpaidCount").textContent = daftarNIM.length - paid;
-    const p = Math.round((paid / daftarNIM.length) * 100);
-    document.getElementById("progressBar").style.width = p + "%";
-    document.getElementById("progressText").textContent = p + "% Terkumpul";
+    // Update nominal di Harta Karun
+    let saldoSaatIni = totalPemasukanGlobal - totalPengeluaran;
+    document.getElementById("treasureAmount").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(saldoSaatIni);
+    
+    document.getElementById("totalPemasukanValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalPemasukanGlobal);
+    document.getElementById("totalPengeluaranValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalPengeluaran);
+
+    renderTabelPengeluaran();
+}
+
+function renderTabelPengeluaran() {
+    const tb = document.getElementById("tabelPengeluaranBody");
+    tb.innerHTML = "";
+    if(riwayatPengeluaran.length === 0) {
+        tb.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-gray); padding: 1.5rem;">Belum ada pengeluaran kelas</td></tr>`; return;
+    }
+    riwayatPengeluaran.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td style="font-size: 0.85rem;">${item.tanggal}</td><td style="font-weight: 500;">${item.keterangan}</td><td style="color:var(--danger); font-weight:bold;">- Rp ${new Intl.NumberFormat('id-ID').format(item.nominal)}</td>`;
+        tb.appendChild(tr);
+    });
+}
+
+// ADMIN & PENGELUARAN
+function adminLoginPrompt() {
+    if (isAdmin) {
+        isAdmin = false; showToast("🔒 Logout berhasil"); document.getElementById('adminIcon').className = 'fa-solid fa-lock'; document.getElementById('btnTambahPengeluaran').style.display = 'none';
+    } else {
+        const pass = prompt("Masukkan Password Admin:");
+        if (pass === adminPass) { 
+            isAdmin = true; showToast("🔓 Mode Admin Aktif!"); document.getElementById('adminIcon').className = 'fa-solid fa-lock-open'; document.getElementById('btnTambahPengeluaran').style.display = 'block';
+        } else { showToast("❌ Password salah!", true); }
+    }
+    renderTable();
+}
+
+function bukaModalPengeluaran() { const m = document.getElementById("modalFormPengeluaran"); m.style.display = "flex"; setTimeout(() => m.classList.add("show"), 10); }
+function tutupModalPengeluaran() { const m = document.getElementById("modalFormPengeluaran"); m.classList.remove("show"); setTimeout(() => m.style.display = "none", 300); }
+
+document.getElementById("formInputPengeluaran").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const tglRaw = document.getElementById("tglPengeluaran").value; 
+    const ket = document.getElementById("ketPengeluaran").value;
+    const nom = parseInt(document.getElementById("nomPengeluaran").value);
+    const parts = tglRaw.split("-"); const tglRapi = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    riwayatPengeluaran.push({ tanggal: tglRapi, keterangan: ket, nominal: nom });
+    tutupModalPengeluaran(); document.getElementById("formInputPengeluaran").reset(); updateDashboard(); 
+    showToast("✅ Pengeluaran dicatat (Sementara)!");
+});
+
+function prosesAdmin(nim, bulan, actionStatus) {
+    if(!confirm(`Yakin ingin mengubah status menjadi ${actionStatus}?`)) return;
+    showToast("⚙️ Memproses...", false);
+    const payload = { action: "update_status", nim: nim, bulan: bulan, status: actionStatus };
+    fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r => r.json()).then(d => {
+        if(d.result === "success") { showToast("✅ Berhasil diupdate!"); loadDataFromServer(); } else { showToast("❌ Gagal: " + d.message, true); }
+    }).catch(e => { console.error(e); showToast("❌ Error koneksi", true); });
+}
+
+// LOGIKA LAINNYA
+function tagihGrupWA() {
+    const bulanVal = document.getElementById("bulanSelectView").value; const bulanName = document.getElementById("bulanSelectView").options[document.getElementById("bulanSelectView").selectedIndex].text;
+    const deadlineDate = new Date(); deadlineDate.setMonth(parseInt(bulanVal), 0); deadlineDate.setHours(23,59,59);
+    const isPastDeadline = (deadlineDate - new Date()) <= 0;
+    let listBelumBayar = [];
+    daftarNIM.forEach((nim, index) => {
+        const data = statusBayar[nim]?.[bulanVal]; const nama = dbMahasiswa[nim] || "Mahasiswa";
+        if (!data || (!data.paid && data.statusText !== "Menunggu Konfirmasi")) { listBelumBayar.push(`${listBelumBayar.length + 1}. ${nama}${isPastDeadline ? " *(+ Denda Rp 5.000)*" : ""}`); }
+    });
+    if(listBelumBayar.length === 0) { showToast("🎉 Semua mahasiswa sudah bayar bulan ini!"); return; }
+    window.open(`https://wa.me/?text=${encodeURIComponent(`*📢 PENGUMUMAN KAS KELAS ST24*\n\nBerikut daftar mahasiswa yang *BELUM* melunasi uang kas untuk bulan *${bulanName}*:\n\n` + listBelumBayar.join("\n") + `\n\nTotal: ${listBelumBayar.length} Mahasiswa.\nMohon segera melakukan pembayaran${isPastDeadline ? " beserta dendanya" : ""}. Terima kasih 🙏\n\n_Data per ${new Date().toLocaleDateString('id-ID')}_`)}`, '_blank');
 }
 
 document.getElementById("paymentForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const nim = document.getElementById("nim").value.trim();
-    const bln = document.getElementById("bulanSelectForm").value;
-    const met = document.getElementById("metode").value;
-    const file = document.getElementById("bukti").files[0];
-    const btn = document.querySelector('.pay-btn');
+    const nim = document.getElementById("nim").value.trim(); const bln = document.getElementById("bulanSelectForm").value;
+    const met = document.getElementById("metode").value; const file = document.getElementById("bukti").files[0]; const btn = document.querySelector('.pay-btn');
     if(!daftarNIM.includes(nim)) { showToast("⚠️ NIM tidak terdaftar!", true); return; }
     if(met==="Transfer" && !file) { showToast("⚠️ Wajib upload bukti!", true); return; }
-
     const oriTxt = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`; btn.disabled = true;
-    const payload = { nim, bulan: bln, metode: met, buktiBase64: null };
-    
-    const send = () => {
-        fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-        .then(r=>r.json()).then(d=>{
-            if(d.result==="success"){ 
-                showToast("✅ Terkirim!"); 
-                document.getElementById("paymentForm").reset(); 
-                document.getElementById("buktiContainer").style.display="none"; 
-                loadDataFromServer(); 
-                switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]);
-            }
-            else throw new Error(d.message);
-        }).catch(e=>showToast("❌ Error: "+e.message, true)).finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
+    const send = (b64) => {
+        fetch(scriptURL, { method: 'POST', body: JSON.stringify({ nim, bulan: bln, metode: met, buktiBase64: b64 || null }) })
+        .then(r=>r.json()).then(d=>{ if(d.result==="success"){ showToast("✅ Terkirim!"); document.getElementById("paymentForm").reset(); document.getElementById("buktiContainer").style.display="none"; loadDataFromServer(); switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); } else throw new Error(d.message); })
+        .catch(e=>showToast("❌ Error: "+e.message, true)).finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
     };
-
-    if(file){ const r=new FileReader(); r.onload=function(){payload.buktiBase64=r.result; send();}; r.readAsDataURL(file); } else { send(); }
+    if(file){ const r=new FileReader(); r.onload=()=>send(r.result); r.readAsDataURL(file); } else send(null);
 });
 
 const nimIn = document.getElementById("nim"); const sugBox = document.getElementById("customSuggestions");
@@ -453,132 +592,20 @@ nimIn.addEventListener('input', function() {
     if (m.length > 0) {
         sugBox.style.display = 'block';
         m.slice(0, 10).forEach(n => {
-            const d = document.createElement('div'); d.className = 'suggestion-item';
-            d.innerHTML = `<span>${n}</span> <strong>${dbMahasiswa[n]||"MHS"}</strong>`;
-            d.onclick = () => { nimIn.value = n; document.getElementById("namaDisplay").textContent = dbMahasiswa[n]||""; sugBox.style.display = 'none'; };
-            sugBox.appendChild(d);
+            const d = document.createElement('div'); d.className = 'suggestion-item'; d.innerHTML = `<span>${n}</span> <strong>${dbMahasiswa[n]||"MHS"}</strong>`;
+            d.onclick = () => { nimIn.value = n; document.getElementById("namaDisplay").textContent = dbMahasiswa[n]||""; sugBox.style.display = 'none'; }; sugBox.appendChild(d);
         });
     } else sugBox.style.display = 'none';
 });
 document.onclick = (e) => { if (e.target!==nimIn && e.target!==sugBox) sugBox.style.display = 'none'; };
 document.getElementById("metode").onchange = function(){ document.getElementById("buktiContainer").style.display = this.value==="Transfer"?"block":"none"; };
-function toggleTheme() {
-    const d = document.body.getAttribute('data-theme')==='dark';
-    document.body.setAttribute('data-theme', d?'':'dark'); localStorage.setItem('theme', d?'light':'dark');
-    document.querySelector('.theme-toggle i.fa-moon, .theme-toggle i.fa-sun').className = d?'fa-solid fa-moon':'fa-solid fa-sun';
-}
-function exportToPDF() {
-    // Tampilkan pesan loading
-    showToast("⏳ Menyiapkan PDF...", false);
-    
-    // Inisialisasi jsPDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Ambil nama bulan yang sedang dilihat
-    const bulanSelect = document.getElementById("bulanSelectView");
-    const bulanName = bulanSelect.options[bulanSelect.selectedIndex].text;
-    
-    // Buat Judul Dokumen di dalam PDF
-    doc.setFontSize(14);
-    doc.text(`Laporan Pembayaran Kas Kelas ST24 - Bulan ${bulanName}`, 14, 15);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
-
-    // Siapkan wadah untuk data tabel
-    const bodyData = [];
-    const rows = document.getElementById("tableBody").rows;
-    
-    // Cek jika tabel kosong
-    if(rows.length === 1 && rows[0].cells.length === 1) { 
-        showToast("⚠️ Tidak ada data untuk diunduh", true);
-        return;
-    }
-
-    // Looping data dari tabel HTML ke PDF (Kecuali kolom tombol Aksi)
-    for(let i=0; i<rows.length; i++) {
-        const cellNo = rows[i].cells[0].innerText;
-        const cellNama = rows[i].cells[1].innerText;
-        const cellStatus = rows[i].cells[2].innerText; // otomatis mengambil teks seperti "Belum Bayar Denda Rp 5.000"
-        const cellMetode = rows[i].cells[3].innerText;
-        bodyData.push([cellNo, cellNama, cellStatus, cellMetode]);
-    }
-
-    // Cetak Tabel ke PDF
-    doc.autoTable({
-        startY: 28,
-        head: [['No', 'Nama / NIM', 'Status', 'Metode']],
-        body: bodyData,
-        theme: 'grid',
-        headStyles: { fillColor: [79, 70, 229] }, // Warna biru ungu (var(--primary))
-        styles: { font: 'helvetica', fontSize: 9 },
-        columnStyles: {
-            0: { cellWidth: 15 }, // Lebar kolom No
-            1: { cellWidth: 80 }, // Lebar kolom Nama
-            2: { cellWidth: 40 }, // Lebar kolom Status
-            3: { cellWidth: 30 }  // Lebar kolom Metode
-        }
-    });
-
-    // Simpan file
-    doc.save(`Laporan_Kas_ST24_${bulanName}.pdf`);
-    showToast("✅ PDF Berhasil diunduh!");
-}
-
-function updateCountdown(){
-    const b = parseInt(document.getElementById("bulanSelectView").value);
-    const d = new Date(); d.setMonth(b, 0); d.setHours(23,59,59);
-    const diff = d - new Date();
-    document.getElementById("countdownTimer").textContent = diff<=0 ? "Ditutup" : `${Math.floor(diff/86400000)} Hari ${Math.floor((diff/3600000)%24)} Jam`;
-}
+function toggleTheme() { const d = document.body.getAttribute('data-theme')==='dark'; document.body.setAttribute('data-theme', d?'':'dark'); localStorage.setItem('theme', d?'light':'dark'); document.querySelector('.theme-toggle i.fa-moon, .theme-toggle i.fa-sun').className = d?'fa-solid fa-moon':'fa-solid fa-sun'; }
+function updateCountdown(){ const b = parseInt(document.getElementById("bulanSelectView").value); const d = new Date(); d.setMonth(b, 0); d.setHours(23,59,59); const diff = d - new Date(); document.getElementById("countdownTimer").textContent = diff<=0 ? "Ditutup" : `${Math.floor(diff/86400000)} Hari ${Math.floor((diff/3600000)%24)} Jam`; }
 function showToast(m, e=false){ const t=document.getElementById("toast"); t.textContent=m; t.className="toast show"+(e?" error":""); setTimeout(()=>t.classList.remove("show"),3000); }
-const m=document.getElementById("imageModal"); const s=document.querySelector(".close-modal");
-function openModal(src){ m.style.display="flex"; setTimeout(()=>m.classList.add("show"),10); document.getElementById("img01").src=src; }
-s.onclick = () => { m.classList.remove("show"); setTimeout(() => { m.style.display = "none"; }, 300); };
-m.onclick = (e) => { if (e.target === m) s.onclick(); };
-
-document.getElementById("bulanSelectView").onchange=()=>{renderTable(); updateDashboard(); updateCountdown();};
-document.getElementById("searchBar").oninput=renderTable;
-
-function adminLoginPrompt() {
-    if (isAdmin) {
-        isAdmin = false; showToast("🔒 Logout berhasil"); document.getElementById('adminIcon').className = 'fa-solid fa-lock';
-    } else {
-        const pass = prompt("Masukkan Password Admin:");
-        if (pass === adminPass) { isAdmin = true; showToast("🔓 Mode Admin Aktif!"); document.getElementById('adminIcon').className = 'fa-solid fa-lock-open'; } 
-        else { showToast("❌ Password salah!", true); }
-    }
-    renderTable();
-}
-function prosesAdmin(nim, bulan, actionStatus) {
-    if(!confirm(`Yakin ingin mengubah status menjadi ${actionStatus}?`)) return;
-    showToast("⚙️ Memproses...", false);
-    const payload = { action: "update_status", nim: nim, bulan: bulan, status: actionStatus };
-    fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
-    .then(r => r.json()).then(d => {
-        if(d.result === "success") { showToast("✅ Berhasil diupdate!"); loadDataFromServer(); } 
-        else { showToast("❌ Gagal: " + d.message, true); }
-    }).catch(e => { console.error(e); showToast("❌ Error koneksi", true); });
-}
-// Fungsi baru untuk mengambil sumber gambar dengan aman dari memori
-function bukaBuktiGambar(nim, bulan) {
-    // Ambil data gambar dari database lokal kita
-    const dataGambar = statusBayar[nim][bulan].bukti;
-    
-    // Cek jika gambar dari Google Drive, kita perbaiki formatnya agar bisa tampil di HTML
-    if (dataGambar.includes("drive.google.com/file/d/")) {
-        const idDrive = dataGambar.match(/[-\w]{25,}/); // Mengambil ID dari URL
-        if (idDrive) {
-            openModal(`https://drive.google.com/uc?id=${idDrive[0]}`);
-            return;
-        }
-    }
-    
-    // Jika formatnya Base64 atau URL biasa
-    openModal(dataGambar);
-}
-
+function openModal(src){ const m=document.getElementById("imageModal"); m.style.display="flex"; setTimeout(()=>m.classList.add("show"),10); document.getElementById("img01").src=src; }
+function tutupModalGambar() { const m=document.getElementById("imageModal"); m.classList.remove("show"); setTimeout(() => { m.style.display = "none"; }, 300); }
+function exportToPDF() { showToast("⏳ Menyiapkan PDF...", false); const { jsPDF } = window.jspdf; const doc = new jsPDF(); const bSelect = document.getElementById("bulanSelectView"); const bName = bSelect.options[bSelect.selectedIndex].text; doc.setFontSize(14); doc.text(`Laporan Pembayaran Kas - Bulan ${bName}`, 14, 15); doc.setFontSize(10); doc.setTextColor(100); doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 22); const bodyData = []; const rows = document.getElementById("tableBody").rows; if(rows.length === 1 && rows[0].cells.length === 1) { showToast("⚠️ Tidak ada data untuk diunduh", true); return; } for(let i=0; i<rows.length; i++) { bodyData.push([rows[i].cells[0].innerText, rows[i].cells[1].innerText, rows[i].cells[2].innerText, rows[i].cells[3].innerText]); } doc.autoTable({ startY: 28, head: [['No', 'Nama / NIM', 'Status', 'Metode']], body: bodyData, theme: 'grid', headStyles: { fillColor: [79, 70, 229] }, styles: { font: 'helvetica', fontSize: 9 }, columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 80 }, 2: { cellWidth: 40 }, 3: { cellWidth: 30 } } }); doc.save(`Laporan_Kas_${bName}.pdf`); showToast("✅ PDF diunduh!"); }
+document.getElementById("bulanSelectView").onchange=()=>{renderTable(); updateDashboard(); updateCountdown();}; document.getElementById("searchBar").oninput=renderTable;
 init();
 </script>
 </body>
