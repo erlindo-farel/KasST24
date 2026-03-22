@@ -546,8 +546,17 @@ function updateDashboard() {
     
     // STATISTIK BULAN INI
     let paidBulanIni = 0;
-    daftarNIM.forEach(nim => { if (statusBayar[nim]?.[bulan]?.paid) paidBulanIni++; });
-    document.getElementById("totalKasBulanIni").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(paidBulanIni * 10000);
+    let uangTerkumpulBulanIni = 0; // Variabel baru untuk menampung nominal dinamis
+
+    daftarNIM.forEach(nim => { 
+        if (statusBayar[nim]?.[bulan]?.paid) {
+            paidBulanIni++; 
+            // Ambil nominal asli dari database, kalau kosong anggap 10000
+            uangTerkumpulBulanIni += Number(statusBayar[nim][bulan].nominal) || 10000;
+        }
+    });
+
+    document.getElementById("totalKasBulanIni").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(uangTerkumpulBulanIni);
     document.getElementById("unpaidCount").textContent = daftarNIM.length - paidBulanIni;
     const progressPerc = Math.round((paidBulanIni / daftarNIM.length) * 100);
     document.getElementById("progressBar").style.width = progressPerc + "%";
@@ -556,20 +565,28 @@ function updateDashboard() {
     // STATISTIK GLOBAL (PETI HARTA)
     let totalPemasukanGlobal = 0;
     daftarNIM.forEach(nim => {
-        if (statusBayar[nim]) { Object.keys(statusBayar[nim]).forEach(bln => { if (statusBayar[nim][bln].paid) totalPemasukanGlobal += 10000; }); }
+        if (statusBayar[nim]) { 
+            Object.keys(statusBayar[nim]).forEach(bln => { 
+                if (statusBayar[nim][bln].paid) {
+                    // Ambil nominal asli dari database untuk total peti harta karun
+                    totalPemasukanGlobal += Number(statusBayar[nim][bln].nominal) || 10000;
+                }
+            }); 
+        }
     });
+
     let totalPengeluaran = 0;
     riwayatPengeluaran.forEach(item => { totalPengeluaran += item.nominal; });
     
     // Update nominal di Harta Karun
     let saldoSaatIni = totalPemasukanGlobal - totalPengeluaran;
     document.getElementById("treasureAmount").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(saldoSaatIni);
-    
     document.getElementById("totalPemasukanValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalPemasukanGlobal);
     document.getElementById("totalPengeluaranValue").textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalPengeluaran);
 
     renderTabelPengeluaran();
 }
+
 
 function renderTabelPengeluaran() {
     const tb = document.getElementById("tabelPengeluaranBody");
@@ -637,18 +654,74 @@ function tagihGrupWA() {
 
 document.getElementById("paymentForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const nim = document.getElementById("nim").value.trim(); const bln = document.getElementById("bulanSelectForm").value;
-    const met = document.getElementById("metode").value; const file = document.getElementById("bukti").files[0]; const btn = document.querySelector('.pay-btn');
+    const nim = document.getElementById("nim").value.trim(); 
+    const bln = document.getElementById("bulanSelectForm").value;
+    const met = document.getElementById("metode").value; 
+    const file = document.getElementById("bukti").files[0]; 
+    const btn = document.querySelector('.pay-btn');
+    
     if(!daftarNIM.includes(nim)) { showToast("⚠️ NIM tidak terdaftar!", true); return; }
     if(met==="Transfer" && !file) { showToast("⚠️ Wajib upload bukti!", true); return; }
-    const oriTxt = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`; btn.disabled = true;
+    
+    // --- CEK APAKAH MAHASISWA INI TELAT BAYAR ---
+    const deadlineDate = new Date(); 
+    deadlineDate.setMonth(parseInt(bln), 0); // Hari terakhir bulan tujuan
+    deadlineDate.setHours(23,59,59);
+    const isTelat = (deadlineDate - new Date()) <= 0;
+    
+    const oriTxt = btn.innerHTML; 
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${isTelat ? "AI Sedang Cek Denda..." : "Mengirim..."}`; 
+    btn.disabled = true;
+
+    // Hapus pesan error denda lama jika ada
+    const oldErr = document.getElementById("errorDendaBox");
+    if(oldErr) oldErr.remove();
+
     const send = (b64) => {
-        fetch(scriptURL, { method: 'POST', body: JSON.stringify({ nim, bulan: bln, metode: met, buktiBase64: b64 || null }) })
-        .then(r=>r.json()).then(d=>{ if(d.result==="success"){ showToast("✅ Terkirim!"); document.getElementById("paymentForm").reset(); document.getElementById("buktiContainer").style.display="none"; loadDataFromServer(); switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); } else throw new Error(d.message); })
-        .catch(e=>showToast("❌ Error: "+e.message, true)).finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
+        // Kirim data ke Google Apps Script (tambahkan status cekDenda)
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: JSON.stringify({ nim, bulan: bln, metode: met, buktiBase64: b64 || null, cekDenda: isTelat }) 
+        })
+        .then(r=>r.json())
+        .then(d=>{ 
+            if(d.result==="success"){ 
+                if(isTelat) {
+                    showToast("✅ AI: Bukti Valid (Termasuk Denda Lunas)!");
+                } else {
+                    showToast("✅ Terkirim! Menunggu konfirmasi Zahrah.");
+                }
+                document.getElementById("paymentForm").reset(); 
+                document.getElementById("buktiContainer").style.display="none"; 
+                loadDataFromServer(); 
+                switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); 
+            } 
+            else if (d.result === "kurang_bayar") {
+                // Jika AI mendeteksi nominal di struk kurang dari Rp 15.000
+                showToast("❌ Ditolak AI: Nominal Kurang!", true);
+                
+                // Munculkan peringatan merah di bawah tombol
+                const errBox = document.createElement("div");
+                errBox.id = "errorDendaBox";
+                errBox.style.color = "var(--danger)";
+                errBox.style.marginTop = "15px";
+                errBox.style.padding = "10px";
+                errBox.style.background = "rgba(239, 68, 68, 0.1)";
+                errBox.style.borderRadius = "8px";
+                errBox.style.border = "1px solid var(--danger)";
+                errBox.innerHTML = `⚠️ <b>AI Menolak Bukti:</b> Kamu telat bayar, tapi mentransfer kurang dari Rp 15.000.<br><span style="font-size:1.2rem; font-weight:800; display:block; margin-top:5px;">- Rp 5.000 (Denda belum dibayar)</span>`;
+                
+                btn.parentNode.appendChild(errBox);
+            }
+            else { throw new Error(d.message); } 
+        })
+        .catch(e=>showToast("❌ Error: "+e.message, true))
+        .finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
     };
+    
     if(file){ const r=new FileReader(); r.onload=()=>send(r.result); r.readAsDataURL(file); } else send(null);
 });
+
 
 const nimIn = document.getElementById("nim"); const sugBox = document.getElementById("customSuggestions");
 nimIn.addEventListener('input', function() {
