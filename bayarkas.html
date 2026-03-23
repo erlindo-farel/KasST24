@@ -490,7 +490,14 @@ function init() {
 function loadDataFromServer() {
     showToast("🔄 Menyinkronkan data...", false);
     fetch(scriptURL).then(r=>r.json()).then(d=>{
-        statusBayar = d; renderTable(); updateDashboard(); showToast("✅ Data berhasil dimuat!");
+        statusBayar = d; 
+        fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "get_pengeluaran" }) })
+        .then(r2=>r2.json()).then(d2=>{
+            riwayatPengeluaran = d2.data || [];
+            renderTable(); updateDashboard(); showToast("✅ Data berhasil dimuat!");
+        }).catch(e=>{
+            renderTable(); updateDashboard(); showToast("⚠️ Data Kas OK, Pengeluaran gagal", true);
+        });
     }).catch(e=>{console.error(e); showToast("❌ Gagal memuat data", true);});
 }
 
@@ -623,10 +630,24 @@ document.getElementById("formInputPengeluaran").addEventListener("submit", (e) =
     const ket = document.getElementById("ketPengeluaran").value;
     const nom = parseInt(document.getElementById("nomPengeluaran").value);
     const parts = tglRaw.split("-"); const tglRapi = `${parts[2]}/${parts[1]}/${parts[0]}`;
-    riwayatPengeluaran.push({ tanggal: tglRapi, keterangan: ket, nominal: nom });
-    tutupModalPengeluaran(); document.getElementById("formInputPengeluaran").reset(); updateDashboard(); 
-    showToast("✅ Pengeluaran dicatat (Sementara)!");
+    
+    const btn = e.target.querySelector('button');
+    const oriTxt = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+    btn.disabled = true;
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "tambah_pengeluaran", tanggal: tglRapi, keterangan: ket, nominal: nom })
+    }).then(r=>r.json()).then(d=>{
+        if(d.result === "success") {
+            tutupModalPengeluaran(); document.getElementById("formInputPengeluaran").reset(); 
+            loadDataFromServer(); showToast("✅ Pengeluaran tersimpan permanen!");
+        } else { throw new Error(d.message); }
+    }).catch(e=>{ showToast("❌ Error: Gagal menyimpan data", true); })
+    .finally(()=>{ btn.innerHTML = oriTxt; btn.disabled = false; });
 });
+
 
 function prosesAdmin(nim, bulan, actionStatus) {
     if(!confirm(`Yakin ingin mengubah status menjadi ${actionStatus}?`)) return;
@@ -670,7 +691,7 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
     const isTelat = (deadlineDate - new Date()) <= 0;
     
     const oriTxt = btn.innerHTML; 
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${isTelat ? "AI Sedang Cek Denda..." : "Mengirim..."}`; 
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${isTelat ? "Memeriksa bukti..." : "Mengirim..."}`; 
     btn.disabled = true;
 
     // Hapus pesan error denda lama jika ada
@@ -709,7 +730,7 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
                 errBox.style.background = "rgba(239, 68, 68, 0.1)";
                 errBox.style.borderRadius = "8px";
                 errBox.style.border = "1px solid var(--danger)";
-                errBox.innerHTML = `⚠️ <b>AI Menolak Bukti:</b> Kamu telat bayar, tapi mentransfer kurang dari Rp 15.000.<br><span style="font-size:1.2rem; font-weight:800; display:block; margin-top:5px;">- Rp 5.000 (Denda belum dibayar)</span>`;
+                errBox.innerHTML = `⚠️ <b>AI Menolak Bukti:</b> Hayoo... ketahuan nih telat bayar kas! karena udah lewat bulan, transfernya harus Rp 15.000 ya (termasuk denda).<br><span style="font-size:1.2rem; font-weight:800; display:block; margin-top:5px;">- Rp 5.000 (Denda belum dibayar)</span>`;
                 
                 btn.parentNode.appendChild(errBox);
             }
