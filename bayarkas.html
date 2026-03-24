@@ -730,7 +730,7 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
                 errBox.style.background = "rgba(239, 68, 68, 0.1)";
                 errBox.style.borderRadius = "8px";
                 errBox.style.border = "1px solid var(--danger)";
-                errBox.innerHTML = `⚠️ <b>AI Menolak Bukti:</b> Hayoo... ketahuan nih telat bayar kas! karena udah lewat bulan, transfernya harus Rp 15.000 ya (termasuk denda).<br><span style="font-size:1.2rem; font-weight:800; display:block; margin-top:5px;">- Rp 5.000 (Denda belum dibayar)</span>`;
+                errBox.innerHTML = `⚠️ <b>Bukti ditolak!:</b> Hayoo... ketahuan nih telat bayar kas! karena udah lewat bulan, transfernya harus Rp 15.000 ya (termasuk denda).<br><span style="font-size:1.2rem; font-weight:800; display:block; margin-top:5px;">- Rp 5.000 (Denda belum dibayar)</span>`;
                 
                 btn.parentNode.appendChild(errBox);
             }
