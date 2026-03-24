@@ -719,7 +719,7 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
             } 
             else if (d.result === "kurang_bayar") {
                 // Jika AI mendeteksi nominal di struk kurang dari Rp 15.000
-                showToast("❌ Ditolak AI: Nominal Kurang!", true);
+                showToast("❌ Nominal Kurang!", true);
                 
                 // Munculkan peringatan merah di bawah tombol
                 const errBox = document.createElement("div");
