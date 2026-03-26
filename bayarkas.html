@@ -594,16 +594,25 @@ function updateDashboard() {
     renderTabelPengeluaran();
 }
 
-
 function renderTabelPengeluaran() {
     const tb = document.getElementById("tabelPengeluaranBody");
     tb.innerHTML = "";
     if(riwayatPengeluaran.length === 0) {
         tb.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-gray); padding: 1.5rem;">Belum ada pengeluaran kelas</td></tr>`; return;
     }
+    
     riwayatPengeluaran.forEach((item) => {
+        let tglRapi = item.tanggal;
+        
+        // Memotong dan merapikan tanggal panjang dari Google Sheets
+        if (tglRapi.includes("GMT") || tglRapi.includes("Waktu")) {
+            let d = new Date(tglRapi);
+            // Ubah format menjadi ex: "18 Feb 2026"
+            tglRapi = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td style="font-size: 0.85rem;">${item.tanggal}</td><td style="font-weight: 500;">${item.keterangan}</td><td style="color:var(--danger); font-weight:bold;">- Rp ${new Intl.NumberFormat('id-ID').format(item.nominal)}</td>`;
+        tr.innerHTML = `<td style="font-size: 0.85rem;">${tglRapi}</td><td style="font-weight: 500;">${item.keterangan}</td><td style="color:var(--danger); font-weight:bold;">- Rp ${new Intl.NumberFormat('id-ID').format(item.nominal)}</td>`;
         tb.appendChild(tr);
     });
 }
