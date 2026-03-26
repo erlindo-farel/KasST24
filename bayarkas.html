@@ -736,7 +736,7 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
     const oldErr = document.getElementById("errorDendaBox");
     if(oldErr) oldErr.remove();
 
-    const send = (b64) => {
+        const send = (b64) => {
         // Kirim data ke Google Apps Script (tambahkan status cekDenda)
         fetch(scriptURL, { 
             method: 'POST', 
@@ -746,20 +746,20 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
         .then(d=>{ 
             if(d.result==="success"){ 
                 if (isTelat && met === "Transfer") {
-    showToast("✅ Bukti Valid! Menunggu konfirmasi bendahara");
-} else {
-    showToast("✅ Data Terkirim! Menunggu konfirmasi bendahara");
-}
+                    showToast("✅ Bukti Valid! Menunggu konfirmasi bendahara");
+                } else {
+                    showToast("✅ Data Terkirim! Menunggu konfirmasi bendahara");
+                }
 
-document.getElementById("paymentForm").reset(); 
-document.getElementById("buktiContainer").style.display="none"; 
+                document.getElementById("paymentForm").reset(); 
+                document.getElementById("buktiContainer").style.display="none"; 
 
-// Berikan jeda 2 detik (2000 milidetik) agar mahasiswa bisa membaca notifikasinya
-setTimeout(() => {
-    switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); 
-    loadDataFromServer(); 
-}, 2000);
-
+                // Berikan jeda 2 detik (2000 milidetik) agar mahasiswa bisa membaca notifikasinya
+                setTimeout(() => {
+                    switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); 
+                    loadDataFromServer(); 
+                }, 2000);
+            } // <--- INI DIA PENYELAMATNYA (KURUNG TUTUP)
             else if (d.result === "kurang_bayar") {
                 // Jika AI mendeteksi nominal di struk kurang dari Rp 15.000
                 showToast("❌ Nominal Kurang!", true);
@@ -782,6 +782,7 @@ setTimeout(() => {
         .catch(e=>showToast("❌ Error: "+e.message, true))
         .finally(()=>{ btn.innerHTML=oriTxt; btn.disabled=false; });
     };
+
     
     if(file){ const r=new FileReader(); r.onload=()=>send(r.result); r.readAsDataURL(file); } else send(null);
 });
