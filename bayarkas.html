@@ -751,11 +751,15 @@ document.getElementById("paymentForm").addEventListener("submit", (e) => {
     showToast("✅ Data Terkirim! Menunggu konfirmasi bendahara");
 }
 
-                document.getElementById("paymentForm").reset(); 
-                document.getElementById("buktiContainer").style.display="none"; 
-                loadDataFromServer(); 
-                switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); 
-            } 
+document.getElementById("paymentForm").reset(); 
+document.getElementById("buktiContainer").style.display="none"; 
+
+// Berikan jeda 2 detik (2000 milidetik) agar mahasiswa bisa membaca notifikasinya
+setTimeout(() => {
+    switchTab('tab-data', document.querySelectorAll('.tab-btn')[2]); 
+    loadDataFromServer(); 
+}, 2000);
+
             else if (d.result === "kurang_bayar") {
                 // Jika AI mendeteksi nominal di struk kurang dari Rp 15.000
                 showToast("❌ Nominal Kurang!", true);
